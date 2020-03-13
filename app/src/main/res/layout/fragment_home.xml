@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <be.swentel.solfidola.SheetMusicView.MusicBarView
+        android:id="@+id/view"
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp">
+
+        <be.swentel.solfidola.SheetMusicView.NoteView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:noteValue="LOWER_C"
+            app:noteDuration="FOURTH"/>
+
+        <be.swentel.solfidola.SheetMusicView.NoteView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:noteValue="LOWER_D"
+            app:noteDuration="FOURTH"/>
+
+    </be.swentel.solfidola.SheetMusicView.MusicBarView>
+
+    <Button
+        android:layout_marginTop="20dp"
+        android:id="@+id/play"
+        android:text="@string/play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
