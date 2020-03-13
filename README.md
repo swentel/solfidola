@@ -1,6 +1,6 @@
 # Solfidola
 
-Solfège teaching app. Under development.
+Solfège learning. Under development.
 
 ## Credits
 
