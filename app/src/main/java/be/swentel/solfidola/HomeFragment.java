@@ -14,12 +14,15 @@ import androidx.fragment.app.Fragment;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
+import be.swentel.solfidola.Model.Interval;
 import be.swentel.solfidola.Model.Note;
 import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
+import be.swentel.solfidola.Utility.Preferences;
 import cn.sherlock.com.sun.media.sound.SF2Soundbank;
 import cn.sherlock.com.sun.media.sound.SoftSynthesizer;
 import jp.kshoji.javax.sound.midi.InvalidMidiDataException;
@@ -38,11 +41,13 @@ import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_G;
 
 public class HomeFragment extends Fragment {
 
-    private boolean isPlaying = false;
-    private Receiver recv;
-    private SoftSynthesizer synth;
+    private int interval = 1;
+    private Receiver receiver;
+    private SoftSynthesizer synthesizer;
     private MusicBarView bar;
+    private LinearLayout choicesContainer;
     private ArrayList<Note> randomNotes = new ArrayList<>();
+    private ArrayList<Interval> intervals = new ArrayList<>();
 
     @Nullable
     @Override
@@ -56,18 +61,18 @@ public class HomeFragment extends Fragment {
 
         try {
             SF2Soundbank sf = new SF2Soundbank(requireActivity().getAssets().open("SmallTimGM6mb.sf2"));
-            synth = new SoftSynthesizer();
-            synth.open();
-            synth.loadAllInstruments(sf);
+            synthesizer = new SoftSynthesizer();
+            synthesizer.open();
+            synthesizer.loadAllInstruments(sf);
 
             /*Instrument[] insts = synth.getLoadedInstruments();
             for (Instrument ins : insts) {
                 Log.d(DEBUG_TAG, ins.getName() + " " + ins.getPatch().getBank() + " " + ins.getPatch().getProgram() + " ");
             }*/
 
-            synth.getChannels()[0].programChange(0);
-            synth.getChannels()[1].programChange(1);
-            recv = synth.getReceiver();
+            synthesizer.getChannels()[0].programChange(0);
+            synthesizer.getChannels()[1].programChange(1);
+            receiver = synthesizer.getReceiver();
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(getContext(), "Error loading soundfont: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -77,16 +82,16 @@ public class HomeFragment extends Fragment {
         }
 
         bar = view.findViewById(R.id.bar);
+        choicesContainer = view.findViewById(R.id.choicesContainer);
+        setIntervals();
         drawNotes();
+        drawChoices();
 
-        Button play = view.findViewById(R.id.play);
+        final Button play = view.findViewById(R.id.play);
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!isPlaying) {
-                    isPlaying = true;
-                    play(randomNotes);
-                }
+                play(randomNotes);
             }
         });
 
@@ -94,9 +99,17 @@ public class HomeFragment extends Fragment {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                setIntervals();
                 drawNotes();
+                drawChoices();
             }
         });
+
+        //choicesContainer.post(new Runnable() {
+        //    public void run() {
+        //        play(randomNotes);
+        //    }
+        //});
     }
 
     private NoteView getNote(NoteData.NoteValue value) {
@@ -104,6 +117,58 @@ public class HomeFragment extends Fragment {
         NoteView note = new NoteView(getContext(), data);
         note.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT, 0));
         return note;
+    }
+
+    private void drawChoices() {
+        choicesContainer.removeAllViews();
+
+        Button b;
+        int numberOfChoices = Preferences.getPreference(getContext(), "choice_number", 4);
+        ArrayList<Button> choices = new ArrayList<>();
+
+        // Solution
+        int solution = 0;
+        for (int i = 0; i < intervals.size(); i++) {
+            if (intervals.get(i).getInterval() == interval) {
+                solution = i;
+                break;
+            }
+        }
+
+        b = new Button(getContext());
+        b.setText(intervals.get(solution).getLabel());
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            }
+        });
+        choices.add(b);
+        numberOfChoices--;
+        intervals.remove(solution);
+
+        // Others.
+        while (numberOfChoices != 0) {
+            b = new Button(getContext());
+
+            Random randomGenerator = new Random();
+            int randomIndex = randomGenerator.nextInt(intervals.size());
+            b.setText(intervals.get(randomIndex).getLabel());
+            b.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                }
+            });
+            choices.add(b);
+            intervals.remove(randomIndex);
+            numberOfChoices--;
+        }
+
+        Collections.shuffle(choices);
+        for (Button choice: choices) {
+            choicesContainer.addView(choice);
+        }
     }
 
     /**
@@ -122,20 +187,26 @@ public class HomeFragment extends Fragment {
         notes.add(new Note(71, HIGHER_B));
         notes.add(new Note(72, HIGHER_C));
 
-        Random randomGenerator = new Random();
-        int numberOfElements = 2;
-
         randomNotes.clear();
-        for (int i = 0; i < numberOfElements; i++) {
-            int randomIndex = randomGenerator.nextInt(notes.size());
-            randomNotes.add(notes.get(randomIndex));
-            notes.remove(randomIndex);
-        }
+
+        // Add c as first one.
+        randomNotes.add(notes.get(0));
+        notes.remove(0);
+
+        // Add another one.
+        Random randomGenerator = new Random();
+        int randomIndex = randomGenerator.nextInt(notes.size());
+        randomNotes.add(notes.get(randomIndex));
+        notes.remove(randomIndex);
+
+        // Get interval.
+        interval = randomNotes.get(1).getMidiValue() - randomNotes.get(0).getMidiValue();
 
         for (Note n : randomNotes) {
             NoteView note = getNote(n.getNoteViewValue());
             bar.addView(note);
         }
+
     }
 
     /**
@@ -147,34 +218,43 @@ public class HomeFragment extends Fragment {
         try {
             ShortMessage msg = new ShortMessage();
             msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(0).getMidiValue(), 127);
-            recv.send(msg, TIMESTAMP);
+            receiver.send(msg, TIMESTAMP);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored ) { }
             msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(0).getMidiValue(), 127);
-            recv.send(msg, TIMESTAMP);
+            receiver.send(msg, TIMESTAMP);
 
             msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(1).getMidiValue(), 127);
-            recv.send(msg, TIMESTAMP);
+            receiver.send(msg, TIMESTAMP);
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored ) { }
             msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(1).getMidiValue(), 127);
-            recv.send(msg, TIMESTAMP);
+            receiver.send(msg, TIMESTAMP);
         }
         catch (InvalidMidiDataException e) {
             Toast.makeText(getContext(), "Down: invalid midi data: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
         }
 
-        isPlaying = false;
+    }
+
+    private void setIntervals() {
+        intervals.clear();
+        intervals.add(new Interval(2, "Secunde"));
+        intervals.add(new Interval(4, "Terts"));
+        intervals.add(new Interval(5, "Kwart"));
+        intervals.add(new Interval(7, "Kwint"));
+        intervals.add(new Interval(9, "Sext"));
+        intervals.add(new Interval(11, "Septiem"));
+        intervals.add(new Interval(12, "Octaaf"));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (synth != null) {
-            synth.close();
+        if (synthesizer != null) {
+            synthesizer.close();
         }
     }
 }
