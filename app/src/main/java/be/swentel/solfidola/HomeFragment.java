@@ -1,15 +1,24 @@
 package be.swentel.solfidola;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
 import java.io.IOException;
@@ -45,7 +54,7 @@ public class HomeFragment extends Fragment {
     private Receiver receiver;
     private SoftSynthesizer synthesizer;
     private MusicBarView bar;
-    private LinearLayout choicesContainer;
+    private TableLayout choicesContainer;
     private ArrayList<Note> randomNotes = new ArrayList<>();
     private ArrayList<Interval> intervals = new ArrayList<>();
 
@@ -58,6 +67,8 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        setHasOptionsMenu(true);
 
         try {
             SF2Soundbank sf = new SF2Soundbank(requireActivity().getAssets().open("SmallTimGM6mb.sf2"));
@@ -99,9 +110,7 @@ public class HomeFragment extends Fragment {
         refresh.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setIntervals();
-                drawNotes();
-                drawChoices();
+                doRefresh();
             }
         });
 
@@ -119,11 +128,17 @@ public class HomeFragment extends Fragment {
         return note;
     }
 
+    private void doRefresh() {
+        setIntervals();
+        drawNotes();
+        drawChoices();
+    }
+
     private void drawChoices() {
         choicesContainer.removeAllViews();
 
         Button b;
-        int numberOfChoices = Preferences.getPreference(getContext(), "choice_number", 4);
+        int numberOfChoices = Preferences.getPreference(getContext(), "numberOfChoices", 4);
         ArrayList<Button> choices = new ArrayList<>();
 
         // Solution
@@ -141,6 +156,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 v.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+
+                if (Preferences.getPreference(getContext(), "autoRefresh", true)) {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            doRefresh();
+                        }
+                    }, Preferences.getPreference(getContext(), "autoRefreshDelay", 2) * 1000);
+                }
             }
         });
         choices.add(b);
@@ -165,9 +189,21 @@ public class HomeFragment extends Fragment {
             numberOfChoices--;
         }
 
+        TableRow row = null;
+        int numberOfButtons = 0;
         Collections.shuffle(choices);
         for (Button choice: choices) {
-            choicesContainer.addView(choice);
+
+            if ((numberOfButtons % 2) == 0) {
+                row = new TableRow(getContext());
+                choicesContainer.addView(row);
+                row.addView(choice);
+            }
+            else {
+                row.addView(choice);
+            }
+
+            numberOfButtons++;
         }
     }
 
@@ -256,5 +292,36 @@ public class HomeFragment extends Fragment {
         if (synthesizer != null) {
             synthesizer.close();
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        switch (item.getItemId()) {
+            case R.id.numberOfChoices:
+                final CharSequence[] numberOfChoices = {"2", "3", "4", "5", "6"};
+                AlertDialog.Builder mBuilder = new AlertDialog.Builder(requireContext());
+                mBuilder.setTitle(R.string.number_of_choices);
+                mBuilder.setSingleChoiceItems(numberOfChoices, -1, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Preferences.setPreference(getContext(), "numberOfChoices", Integer.parseInt(numberOfChoices[i].toString()));
+                        dialogInterface.dismiss();
+                        doRefresh();
+                    }
+                });
+
+                AlertDialog mDialog = mBuilder.create();
+                mDialog.show();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

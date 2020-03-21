@@ -12,24 +12,31 @@
         android:layout_height="80dp">
     </be.swentel.solfidola.SheetMusicView.MusicBarView>
 
-    <LinearLayout
-        android:orientation="vertical"
+    <TableLayout
+        android:layout_marginTop="10dp"
         android:id="@+id/choicesContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-    </LinearLayout>
+    </TableLayout>
 
-    <Button
+    <LinearLayout
         android:layout_marginTop="20dp"
-        android:id="@+id/play"
-        android:text="@string/play"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/refresh"
-        android:text="@string/refresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <Button
+            android:id="@+id/play"
+            android:text="@string/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/refresh"
+            android:text="@string/refresh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
 
 </LinearLayout>
