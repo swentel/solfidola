@@ -1,7 +1,6 @@
 package be.swentel.solfidola;
 
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -113,6 +112,17 @@ public class HomeFragment extends Fragment {
                 doRefresh();
             }
         });
+
+        /*Button listen = view.findViewById(R.id.listen);
+        listen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("spotify:album:0sNOF9WDwhWunNAHPD3Baj"));
+                intent.putExtra(Intent.EXTRA_REFERRER, Uri.parse("android-app://" + requireContext().getPackageName()));
+                startActivity(intent);
+            }
+        });*/
 
         //choicesContainer.post(new Runnable() {
         //    public void run() {
