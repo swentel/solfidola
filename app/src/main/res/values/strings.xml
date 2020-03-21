@@ -11,4 +11,6 @@
     <string name="play">Play</string>
     <string name="refresh">Refresh</string>
     <string name="listen">Listen</string>
+    <string name="scale">Scale</string>
+
 </resources>

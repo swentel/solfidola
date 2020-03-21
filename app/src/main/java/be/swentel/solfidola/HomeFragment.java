@@ -1,8 +1,12 @@
 package be.swentel.solfidola;
 
+import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.speech.RecognizerIntent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,6 +27,7 @@ import androidx.fragment.app.Fragment;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import be.swentel.solfidola.Model.Interval;
@@ -30,6 +35,7 @@ import be.swentel.solfidola.Model.Note;
 import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
+import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Preferences;
 import cn.sherlock.com.sun.media.sound.SF2Soundbank;
 import cn.sherlock.com.sun.media.sound.SoftSynthesizer;
@@ -38,6 +44,7 @@ import jp.kshoji.javax.sound.midi.MidiUnavailableException;
 import jp.kshoji.javax.sound.midi.Receiver;
 import jp.kshoji.javax.sound.midi.ShortMessage;
 
+import static android.app.Activity.RESULT_OK;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_A;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_B;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_C;
@@ -56,6 +63,7 @@ public class HomeFragment extends Fragment {
     private TableLayout choicesContainer;
     private ArrayList<Note> randomNotes = new ArrayList<>();
     private ArrayList<Interval> intervals = new ArrayList<>();
+    private static final int SPEECH_REQUEST_CODE = 0;
 
     @Nullable
     @Override
@@ -93,9 +101,7 @@ public class HomeFragment extends Fragment {
 
         bar = view.findViewById(R.id.bar);
         choicesContainer = view.findViewById(R.id.choicesContainer);
-        setIntervals();
-        drawNotes();
-        drawChoices();
+        setup();
 
         final Button play = view.findViewById(R.id.play);
         play.setOnClickListener(new View.OnClickListener() {
@@ -138,10 +144,14 @@ public class HomeFragment extends Fragment {
         return note;
     }
 
-    private void doRefresh() {
+    private void setup() {
         setIntervals();
         drawNotes();
         drawChoices();
+    }
+
+    private void doRefresh() {
+        setup();
     }
 
     private void drawChoices() {
@@ -283,6 +293,7 @@ public class HomeFragment extends Fragment {
             Toast.makeText(getContext(), "Down: invalid midi data: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
 
+        displaySpeechRecognizer();
     }
 
     private void setIntervals() {
@@ -314,6 +325,8 @@ public class HomeFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()) {
+            case R.id.scale:
+                return true;
             case R.id.numberOfChoices:
                 final CharSequence[] numberOfChoices = {"2", "3", "4", "5", "6"};
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(requireContext());
@@ -334,4 +347,33 @@ public class HomeFragment extends Fragment {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void displaySpeechRecognizer() {
+        if (Preferences.getPreference(getContext(), "useSpeech", false)) {
+            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+            try {
+                startActivityForResult(intent, SPEECH_REQUEST_CODE);
+            } catch (ActivityNotFoundException a) {
+                Toast.makeText(getActivity(),
+                        "Your device doesn't support Speech to Text",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
+            List<String> results = data.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS);
+
+            if (results != null) {
+                String spokenText = results.get(0);
+                Debug.debug(spokenText);
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
 }

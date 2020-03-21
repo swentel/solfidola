@@ -6,4 +6,10 @@
         android:orderInCategory="100"
         android:title="@string/number_of_choices"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/scale"
+        android:orderInCategory="100"
+        android:title="@string/scale"
+        app:showAsAction="never" />
 </menu>
