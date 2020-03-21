@@ -1,6 +1,5 @@
 package be.swentel.solfidola;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -54,7 +53,7 @@ import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_E;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_F;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_G;
 
-public class HomeFragment extends Fragment {
+public class SolfegeFragment extends Fragment {
 
     private int interval = 1;
     private Receiver receiver;
@@ -68,7 +67,7 @@ public class HomeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return inflater.inflate(R.layout.fragment_solfege, container, false);
     }
 
     @Override

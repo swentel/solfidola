@@ -23,8 +23,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
      * Set first navigation view.
      */
     private void setFirstItemNavigationView() {
-        navigationView.setCheckedItem(R.id.nav_home);
-        drawerMenu.performIdentifierAction(R.id.nav_home, 0);
+        navigationView.setCheckedItem(R.id.nav_solfege);
+        drawerMenu.performIdentifierAction(R.id.nav_solfege, 0);
     }
 
     @Override
@@ -63,9 +63,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Fragment fragment = null;
         switch (item.getItemId()) {
 
-            case R.id.nav_home:
+            case R.id.nav_solfege:
                 close = true;
-                fragment = new HomeFragment();
+                fragment = new SolfegeFragment();
+                break;
+
+            case R.id.nav_tuner:
+                close = true;
+                fragment = new TunerFragment();
                 break;
 
         }
