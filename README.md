@@ -1,6 +1,6 @@
 # Solfidola
 
-Solfège learning. Under development.
+Solfège learning and more. Under development.
 
 ## Credits
 
