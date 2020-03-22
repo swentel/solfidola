@@ -1,6 +1,7 @@
 package be.swentel.solfidola;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -24,8 +25,12 @@ import be.tarsos.dsp.pitch.PitchProcessor;
 
 public class TunerFragment extends Fragment {
 
-    private TextView text;
+    private TextView pitch;
+    private TextView note;
+    private TextView instruction;
+    private TextView feedback;
     private static final int RECORD_AUDIO_INT = 52;
+    private boolean isRunning = false;
 
     @Nullable
     @Override
@@ -37,9 +42,56 @@ public class TunerFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        text = view.findViewById(R.id.tune);
+        pitch = view.findViewById(R.id.pitch);
+        note = view.findViewById(R.id.note);
+        instruction = view.findViewById(R.id.instruction);
+        feedback = view.findViewById(R.id.feedback);
         if (requestPermission()) {
+            setNote();
             startTuner();
+        }
+    }
+
+    private void setNote() {
+        instruction.setText(String.format(getString(R.string.sing_note), "C"));
+    }
+
+    private void render(float pitchInHz) {
+
+        // Set pitch.
+        pitch.setText(String.format(getString(R.string.pitch_value), pitchInHz));
+
+        boolean ok = false;
+
+        // Set note.
+        if(pitchInHz >= 110 && pitchInHz < 123.47) {
+            note.setText("A");
+        }
+        else if(pitchInHz >= 123.47 && pitchInHz < 130.81) {
+            note.setText("B");
+        }
+        else if(pitchInHz >= 130.81 && pitchInHz < 146.83) {
+            note.setText("C");
+            ok = true;
+        }
+        else if(pitchInHz >= 146.83 && pitchInHz < 164.81) {
+            note.setText("D");
+        }
+        else if(pitchInHz >= 164.81 && pitchInHz <= 174.61) {
+            note.setText("E");
+        }
+        else if(pitchInHz >= 174.61 && pitchInHz < 185) {
+            note.setText("F");
+        }
+        else if(pitchInHz >= 185 && pitchInHz < 196) {
+            note.setText("G");
+        }
+
+        if (ok) {
+            feedback.setText(R.string.feedback_nice);
+        }
+        else {
+            feedback.setText(R.string.feedback_not_close);
         }
     }
 
@@ -70,16 +122,35 @@ public class TunerFragment extends Fragment {
             @Override
             public void handlePitch(PitchDetectionResult result, AudioEvent e) {
                 final float pitchInHz = result.getPitch();
-                requireActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        text.setText("" + pitchInHz);
-                    }
-                });
+                Activity ac = getActivity();
+                if (ac != null) {
+                    ac.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (isRunning && pitchInHz != -1) {
+                                render(pitchInHz);
+                            }
+                        }
+                    });
+                }
             }
         };
+
         AudioProcessor p = new PitchProcessor(PitchProcessor.PitchEstimationAlgorithm.FFT_YIN, 22050, 1024, pdh);
         dispatcher.addAudioProcessor(p);
         new Thread(dispatcher,"Audio Dispatcher").start();
+        isRunning = true;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        isRunning = false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isRunning = false;
     }
 }

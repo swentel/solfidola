@@ -15,5 +15,12 @@
     <string name="refresh">Refresh</string>
     <string name="listen">Listen</string>
     <string name="scale">Scale</string>
+    <string name="pitch_value">Pitch: %f</string>
+    <string name="no_tune">/</string>
+    <string name="no_pitch">-1</string>
+    <string name="pitch_new_note">New note</string>
+    <string name="sing_note">Sing %s</string>
+    <string name="feedback_nice">Nice!</string>
+    <string name="feedback_not_close">Not even close!</string>
 
 </resources>

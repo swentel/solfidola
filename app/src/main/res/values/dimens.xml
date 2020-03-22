@@ -8,4 +8,9 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="big_text">20sp</dimen>
     <dimen name="buttonMargin">10dp</dimen>
+
+    <dimen name="tunerNoteSize">40sp</dimen>
+    <dimen name="tunerPitchSize">20sp</dimen>
+    <dimen name="tunerInstruction">18sp</dimen>
+    <dimen name="tunerFeedback">18sp</dimen>
 </resources>
