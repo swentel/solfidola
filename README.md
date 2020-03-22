@@ -2,6 +2,10 @@
 
 Solfège learning and more. Under development.
 
+## Screenshot
+
+<img src="https://realize.be/sites/default/files/solfidola-solfege.png" width="400" />
+
 ## Credits
 
 This app uses following external libraries:
