@@ -3,14 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item
-        android:id="@+id/nav_solfege"
-        android:icon="@drawable/music_note"
-        android:title="@string/menu_solfege" />
+    <group android:checkableBehavior="single" android:id="@+id/mainGroup">
 
-    <item
-        android:id="@+id/nav_tuner"
-        android:icon="@android:drawable/ic_btn_speak_now"
-        android:title="@string/menu_tuner" />
+        <item
+            android:id="@+id/nav_solfege"
+            android:icon="@drawable/music_note"
+            android:title="@string/menu_solfege" />
+
+        <item
+            android:id="@+id/nav_tuner"
+            android:icon="@android:drawable/ic_btn_speak_now"
+            android:title="@string/menu_tuner" />
+
+    </group>
 
 </menu>

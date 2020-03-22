@@ -6,6 +6,7 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
 
+    <string name="drawer_title">Menu</string>
     <string name="menu_solfege">Solfege</string>
     <string name="menu_tuner">Tuner</string>
 

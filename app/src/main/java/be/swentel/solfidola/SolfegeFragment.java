@@ -23,6 +23,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.tabs.TabLayout;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -169,13 +171,17 @@ public class SolfegeFragment extends Fragment {
             }
         }
 
+        TableRow.LayoutParams params = new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT);
+        params.setMargins(40, 0, 0, 0);
+
         b = new Button(getContext());
         b.setText(intervals.get(solution).getLabel());
+        b.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+        b.setTextColor(getResources().getColor(R.color.buttonDarkText));
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                v.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-
+                v.setBackgroundColor(getResources().getColor(R.color.right));
                 if (Preferences.getPreference(getContext(), "autoRefresh", true)) {
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -197,10 +203,12 @@ public class SolfegeFragment extends Fragment {
             Random randomGenerator = new Random();
             int randomIndex = randomGenerator.nextInt(intervals.size());
             b.setText(intervals.get(randomIndex).getLabel());
+            b.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+            b.setTextColor(getResources().getColor(R.color.buttonDarkText));
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    v.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                    v.setBackgroundColor(getResources().getColor(R.color.wrong));
                 }
             });
             choices.add(b);
@@ -213,13 +221,15 @@ public class SolfegeFragment extends Fragment {
         Collections.shuffle(choices);
         for (Button choice: choices) {
 
-            if ((numberOfButtons % 2) == 0) {
+            if ((numberOfButtons % 3) == 0) {
                 row = new TableRow(getContext());
+                row.setPadding(0, 0, 0, 40);
                 choicesContainer.addView(row);
                 row.addView(choice);
             }
             else {
                 row.addView(choice);
+                choice.setLayoutParams(params);
             }
 
             numberOfButtons++;
@@ -316,7 +326,7 @@ public class SolfegeFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main, menu);
+        inflater.inflate(R.menu.solfege_menu, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -330,6 +340,7 @@ public class SolfegeFragment extends Fragment {
                 final CharSequence[] numberOfChoices = {"2", "3", "4", "5", "6"};
                 AlertDialog.Builder mBuilder = new AlertDialog.Builder(requireContext());
                 mBuilder.setTitle(R.string.number_of_choices);
+                // TODO remove radio buttons
                 mBuilder.setSingleChoiceItems(numberOfChoices, -1, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
