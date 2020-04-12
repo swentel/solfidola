@@ -265,14 +265,16 @@ public class SolfegeFragment extends Fragment {
         notes.add(new Note(72, HIGHER_C));
 
         randomNotes.clear();
-
-        // Add c as first one.
-        randomNotes.add(notes.get(0));
-        notes.remove(0);
-
-        // Add another one.
         Random randomGenerator = new Random();
+
+        // First note
         int randomIndex = randomGenerator.nextInt(notes.size());
+        randomNotes.add(notes.get(randomIndex));
+        notes.remove(randomIndex);
+
+        // Second note.
+        randomGenerator = new Random();
+        randomIndex = randomGenerator.nextInt(notes.size());
         randomNotes.add(notes.get(randomIndex));
         notes.remove(randomIndex);
 
