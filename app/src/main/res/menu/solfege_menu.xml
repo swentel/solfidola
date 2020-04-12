@@ -3,13 +3,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/numberOfChoices"
-        android:orderInCategory="100"
         android:title="@string/number_of_choices"
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/playback"
+        android:title="@string/playback"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/scale"
-        android:orderInCategory="100"
         android:title="@string/scale"
         app:showAsAction="never" />
 </menu>

@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -58,11 +59,13 @@ public class SolfegeFragment extends Fragment {
     private int interval = 1;
     private Receiver receiver;
     private SoftSynthesizer synthesizer;
+    private TextView playbackMode;
     private MusicBarView bar;
     private TableLayout choicesContainer;
     private ArrayList<Note> randomNotes = new ArrayList<>();
     private ArrayList<Interval> intervals = new ArrayList<>();
     private static final int SPEECH_REQUEST_CODE = 0;
+    private static final int PLAYBACK_MELODIC = 0;
 
     @Nullable
     @Override
@@ -99,6 +102,7 @@ public class SolfegeFragment extends Fragment {
         }
 
         bar = view.findViewById(R.id.bar);
+        playbackMode = view.findViewById(R.id.playbackMode);
         choicesContainer = view.findViewById(R.id.choicesContainer);
         setup();
 
@@ -144,6 +148,7 @@ public class SolfegeFragment extends Fragment {
     }
 
     private void setup() {
+        setPlaybackMode();
         setIntervals();
         drawNotes();
         drawChoices();
@@ -151,6 +156,15 @@ public class SolfegeFragment extends Fragment {
 
     private void doRefresh() {
         setup();
+    }
+
+    private void setPlaybackMode() {
+        String mode = getString(R.string.melodic);
+        boolean sleep = Preferences.getPreference(getContext(), "playback", PLAYBACK_MELODIC) == PLAYBACK_MELODIC;
+        if (!sleep) {
+            mode = getString(R.string.harmonic);
+        }
+        playbackMode.setText(String.format(getString(R.string.playback_mode), mode.toLowerCase()));
     }
 
     private void drawChoices() {
@@ -277,24 +291,51 @@ public class SolfegeFragment extends Fragment {
      */
     private void play(ArrayList<Note> notes) {
         long TIMESTAMP = -1;
+        boolean melodic = Preferences.getPreference(getContext(), "playback", PLAYBACK_MELODIC) == PLAYBACK_MELODIC;
 
         try {
-            ShortMessage msg = new ShortMessage();
-            msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(0).getMidiValue(), 127);
-            receiver.send(msg, TIMESTAMP);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored ) { }
-            msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(0).getMidiValue(), 127);
-            receiver.send(msg, TIMESTAMP);
 
-            msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(1).getMidiValue(), 127);
-            receiver.send(msg, TIMESTAMP);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ignored ) { }
-            msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(1).getMidiValue(), 127);
-            receiver.send(msg, TIMESTAMP);
+            if (melodic) {
+                ShortMessage msg = new ShortMessage();
+                msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(0).getMidiValue(), 127);
+                receiver.send(msg, TIMESTAMP);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored ) { }
+
+                msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(0).getMidiValue(), 127);
+                receiver.send(msg, TIMESTAMP);
+
+                msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(1).getMidiValue(), 127);
+                receiver.send(msg, TIMESTAMP);
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ignored ) { }
+
+                msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(1).getMidiValue(), 127);
+                receiver.send(msg, TIMESTAMP);
+            }
+            else {
+                ShortMessage msg = new ShortMessage();
+                msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(0).getMidiValue(), 127);
+                receiver.send(msg, TIMESTAMP);
+
+                msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(1).getMidiValue(), 127);
+                receiver.send(msg, TIMESTAMP);
+
+                try {
+                    Thread.sleep(2500);
+                } catch (InterruptedException ignored ) { }
+
+                msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(0).getMidiValue(), 127);
+                receiver.send(msg, TIMESTAMP);
+
+                msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(1).getMidiValue(), 127);
+                receiver.send(msg, TIMESTAMP);
+            }
+
         }
         catch (InvalidMidiDataException e) {
             Toast.makeText(getContext(), "Down: invalid midi data: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -331,15 +372,32 @@ public class SolfegeFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(requireContext());
+        AlertDialog mDialog;
+
         switch (item.getItemId()) {
+            case R.id.playback:
+                final CharSequence[] playback = {getString(R.string.melodic), getString(R.string.harmonic)};
+                mBuilder.setTitle(R.string.playback);
+                mBuilder.setSingleChoiceItems(playback, Preferences.getPreference(getContext(), "playback", PLAYBACK_MELODIC), new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Preferences.setPreference(getContext(), "playback", i);
+                        dialogInterface.dismiss();
+                        doRefresh();
+                    }
+                });
+
+                mDialog = mBuilder.create();
+                mDialog.show();
+                return true;
             case R.id.scale:
                 return true;
             case R.id.numberOfChoices:
                 final CharSequence[] numberOfChoices = {"2", "3", "4", "5", "6"};
-                AlertDialog.Builder mBuilder = new AlertDialog.Builder(requireContext());
                 mBuilder.setTitle(R.string.number_of_choices);
-                // TODO remove radio buttons
-                mBuilder.setSingleChoiceItems(numberOfChoices, -1, new DialogInterface.OnClickListener() {
+                int currentSelection = Preferences.getPreference(getContext(), "numberOfChoices", 4) - 2;
+                mBuilder.setSingleChoiceItems(numberOfChoices, currentSelection, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Preferences.setPreference(getContext(), "numberOfChoices", Integer.parseInt(numberOfChoices[i].toString()));
@@ -348,7 +406,7 @@ public class SolfegeFragment extends Fragment {
                     }
                 });
 
-                AlertDialog mDialog = mBuilder.create();
+                mDialog = mBuilder.create();
                 mDialog.show();
                 return true;
         }

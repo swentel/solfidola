@@ -9,6 +9,10 @@
     <string name="drawer_title">Menu</string>
     <string name="menu_solfege">Solfege</string>
     <string name="menu_tuner">Tuner</string>
+    <string name="playback">Playback</string>
+    <string name="melodic">Melodic</string>
+    <string name="harmonic">Harmonic</string>
+    <string name="playback_mode">Playback mode: %s</string>
 
     <string name="number_of_choices">Number of choices</string>
     <string name="play">Play</string>
