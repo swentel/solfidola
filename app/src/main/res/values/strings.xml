@@ -13,6 +13,7 @@
     <string name="melodic">Melodic</string>
     <string name="harmonic">Harmonic</string>
     <string name="playback_mode">Playback mode: %s</string>
+    <string name="instrument">Instrument</string>
 
     <string name="number_of_choices">Number of choices</string>
     <string name="play">Play</string>

@@ -32,6 +32,7 @@ import java.util.Random;
 
 import be.swentel.solfidola.Model.Interval;
 import be.swentel.solfidola.Model.Note;
+import be.swentel.solfidola.Model.SolfidolaInstrument;
 import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
@@ -39,6 +40,7 @@ import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Preferences;
 import cn.sherlock.com.sun.media.sound.SF2Soundbank;
 import cn.sherlock.com.sun.media.sound.SoftSynthesizer;
+import jp.kshoji.javax.sound.midi.Instrument;
 import jp.kshoji.javax.sound.midi.InvalidMidiDataException;
 import jp.kshoji.javax.sound.midi.MidiUnavailableException;
 import jp.kshoji.javax.sound.midi.Receiver;
@@ -66,6 +68,8 @@ public class SolfegeFragment extends Fragment {
     private ArrayList<Interval> intervals = new ArrayList<>();
     private static final int SPEECH_REQUEST_CODE = 0;
     private static final int PLAYBACK_MELODIC = 0;
+    private static final int DEFAULT_PROGRAM = 0;
+    private static final int DEFAULT_CHOICES = 4;
 
     @Nullable
     @Override
@@ -80,23 +84,17 @@ public class SolfegeFragment extends Fragment {
         setHasOptionsMenu(true);
 
         try {
-            SF2Soundbank sf = new SF2Soundbank(requireActivity().getAssets().open("SmallTimGM6mb.sf2"));
+            SF2Soundbank sf = new SF2Soundbank(requireActivity().getAssets().open("Solfidola.sf2"));
             synthesizer = new SoftSynthesizer();
             synthesizer.open();
             synthesizer.loadAllInstruments(sf);
-
-            /*Instrument[] insts = synth.getLoadedInstruments();
-            for (Instrument ins : insts) {
-                Log.d(DEBUG_TAG, ins.getName() + " " + ins.getPatch().getBank() + " " + ins.getPatch().getProgram() + " ");
-            }*/
-
-            synthesizer.getChannels()[0].programChange(0);
-            synthesizer.getChannels()[1].programChange(1);
             receiver = synthesizer.getReceiver();
-        } catch (IOException e) {
-            e.printStackTrace();
+            setProgram();
+        }
+        catch (IOException e) {
             Toast.makeText(getContext(), "Error loading soundfont: " + e.getMessage(), Toast.LENGTH_LONG).show();
-        } catch (MidiUnavailableException e) {
+        }
+        catch (MidiUnavailableException e) {
             Toast.makeText(getContext(), "Midi not available: " + e.getMessage(), Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
@@ -167,11 +165,15 @@ public class SolfegeFragment extends Fragment {
         playbackMode.setText(String.format(getString(R.string.playback_mode), mode.toLowerCase()));
     }
 
+    private void setProgram() {
+        synthesizer.getChannels()[0].programChange(Preferences.getPreference(getContext(), "program", DEFAULT_PROGRAM));
+    }
+
     private void drawChoices() {
         choicesContainer.removeAllViews();
 
         Button b;
-        int numberOfChoices = Preferences.getPreference(getContext(), "numberOfChoices", 4);
+        int numberOfChoices = Preferences.getPreference(getContext(), "numberOfChoices", DEFAULT_CHOICES);
         ArrayList<Button> choices = new ArrayList<>();
 
         // Solution
@@ -297,44 +299,45 @@ public class SolfegeFragment extends Fragment {
 
         try {
 
+            int channel = 0;
             if (melodic) {
                 ShortMessage msg = new ShortMessage();
-                msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(0).getMidiValue(), 127);
+                msg.setMessage(ShortMessage.NOTE_ON, channel, notes.get(0).getMidiValue(), 127);
                 receiver.send(msg, TIMESTAMP);
 
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ignored ) { }
 
-                msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(0).getMidiValue(), 127);
+                msg.setMessage(ShortMessage.NOTE_OFF, channel, notes.get(0).getMidiValue(), 127);
                 receiver.send(msg, TIMESTAMP);
 
-                msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(1).getMidiValue(), 127);
+                msg.setMessage(ShortMessage.NOTE_ON, channel, notes.get(1).getMidiValue(), 127);
                 receiver.send(msg, TIMESTAMP);
 
                 try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ignored ) { }
 
-                msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(1).getMidiValue(), 127);
+                msg.setMessage(ShortMessage.NOTE_OFF, channel, notes.get(1).getMidiValue(), 127);
                 receiver.send(msg, TIMESTAMP);
             }
             else {
                 ShortMessage msg = new ShortMessage();
-                msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(0).getMidiValue(), 127);
+                msg.setMessage(ShortMessage.NOTE_ON, channel, notes.get(0).getMidiValue(), 127);
                 receiver.send(msg, TIMESTAMP);
 
-                msg.setMessage(ShortMessage.NOTE_ON, 0, notes.get(1).getMidiValue(), 127);
+                msg.setMessage(ShortMessage.NOTE_ON, channel, notes.get(1).getMidiValue(), 127);
                 receiver.send(msg, TIMESTAMP);
 
                 try {
                     Thread.sleep(2500);
                 } catch (InterruptedException ignored ) { }
 
-                msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(0).getMidiValue(), 127);
+                msg.setMessage(ShortMessage.NOTE_OFF, channel, notes.get(0).getMidiValue(), 127);
                 receiver.send(msg, TIMESTAMP);
 
-                msg.setMessage(ShortMessage.NOTE_OFF, 0, notes.get(1).getMidiValue(), 127);
+                msg.setMessage(ShortMessage.NOTE_OFF, channel, notes.get(1).getMidiValue(), 127);
                 receiver.send(msg, TIMESTAMP);
             }
 
@@ -395,10 +398,44 @@ public class SolfegeFragment extends Fragment {
                 return true;
             case R.id.scale:
                 return true;
+            case R.id.instrument:
+                int delta = 0;
+                int selectedIndex = 0;
+                int currentProgram = Preferences.getPreference(getContext(), "program", DEFAULT_PROGRAM);
+                List<String> items = new ArrayList<>();
+                final List<SolfidolaInstrument> SolfidolaInstruments = new ArrayList<>();
+                Instrument[] instruments = synthesizer.getLoadedInstruments();
+                for (Instrument instrument : instruments) {
+                    SolfidolaInstrument si = new SolfidolaInstrument();
+                    si.setProgram(instrument.getPatch().getProgram());
+                    si.setLabel(instrument.getName());
+                    SolfidolaInstruments.add(si);
+                    items.add(instrument.getName());
+
+                    if (si.getProgram() == currentProgram) {
+                        selectedIndex = delta;
+                    }
+                    delta++;
+                }
+
+                final CharSequence[] SolfidolaChoiceItems = items.toArray(new CharSequence[0]);
+
+                mBuilder.setTitle(R.string.instrument);
+                mBuilder.setSingleChoiceItems(SolfidolaChoiceItems, selectedIndex, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Preferences.setPreference(getContext(), "program", SolfidolaInstruments.get(i).getProgram());
+                        dialogInterface.dismiss();
+                        setProgram();
+                    }
+                });
+                mDialog = mBuilder.create();
+                mDialog.show();
+                return true;
             case R.id.numberOfChoices:
                 final CharSequence[] numberOfChoices = {"2", "3", "4", "5", "6"};
                 mBuilder.setTitle(R.string.number_of_choices);
-                int currentSelection = Preferences.getPreference(getContext(), "numberOfChoices", 4) - 2;
+                int currentSelection = Preferences.getPreference(getContext(), "numberOfChoices", DEFAULT_CHOICES) - 2;
                 mBuilder.setSingleChoiceItems(numberOfChoices, currentSelection, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

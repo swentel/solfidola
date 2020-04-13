@@ -15,4 +15,10 @@
         android:id="@+id/scale"
         android:title="@string/scale"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/instrument"
+        android:title="@string/instrument"
+        app:showAsAction="never" />
+
 </menu>
