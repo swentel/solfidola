@@ -26,7 +26,9 @@ import androidx.fragment.app.Fragment;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
@@ -62,6 +64,7 @@ public class SolfegeFragment extends Fragment {
     private Receiver receiver;
     private SoftSynthesizer synthesizer;
     private TextView playbackMode;
+    private TextView instrument;
     private MusicBarView bar;
     private TableLayout choicesContainer;
     private ArrayList<Note> randomNotes = new ArrayList<>();
@@ -70,6 +73,7 @@ public class SolfegeFragment extends Fragment {
     private static final int PLAYBACK_MELODIC = 0;
     private static final int DEFAULT_PROGRAM = 0;
     private static final int DEFAULT_CHOICES = 4;
+    private static final String DEFAULT_INSTRUMENT = "Standard";
 
     @Nullable
     @Override
@@ -81,6 +85,10 @@ public class SolfegeFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        bar = view.findViewById(R.id.bar);
+        playbackMode = view.findViewById(R.id.playbackMode);
+        instrument = view.findViewById(R.id.instrument);
+        choicesContainer = view.findViewById(R.id.choicesContainer);
         setHasOptionsMenu(true);
 
         try {
@@ -99,9 +107,6 @@ public class SolfegeFragment extends Fragment {
             e.printStackTrace();
         }
 
-        bar = view.findViewById(R.id.bar);
-        playbackMode = view.findViewById(R.id.playbackMode);
-        choicesContainer = view.findViewById(R.id.choicesContainer);
         setup();
 
         final Button play = view.findViewById(R.id.play);
@@ -166,6 +171,7 @@ public class SolfegeFragment extends Fragment {
     }
 
     private void setProgram() {
+        instrument.setText(String.format(getString(R.string.instrument_selected), Preferences.getPreference(getContext(), "instrument", DEFAULT_INSTRUMENT)));
         synthesizer.getChannels()[0].programChange(Preferences.getPreference(getContext(), "program", DEFAULT_PROGRAM));
     }
 
@@ -404,7 +410,15 @@ public class SolfegeFragment extends Fragment {
                 int currentProgram = Preferences.getPreference(getContext(), "program", DEFAULT_PROGRAM);
                 List<String> items = new ArrayList<>();
                 final List<SolfidolaInstrument> SolfidolaInstruments = new ArrayList<>();
-                Instrument[] instruments = synthesizer.getLoadedInstruments();
+                List<Instrument> instruments = Arrays.asList(synthesizer.getLoadedInstruments());
+
+                Collections.sort(instruments, new Comparator<Instrument>() {
+                    @Override
+                    public int compare(Instrument i1, Instrument i2) {
+                        return  i1.getName().compareTo(i2.getName());
+                    }
+                });
+
                 for (Instrument instrument : instruments) {
                     SolfidolaInstrument si = new SolfidolaInstrument();
                     si.setProgram(instrument.getPatch().getProgram());
@@ -425,6 +439,7 @@ public class SolfegeFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Preferences.setPreference(getContext(), "program", SolfidolaInstruments.get(i).getProgram());
+                        Preferences.setPreference(getContext(), "instrument", SolfidolaInstruments.get(i).getLabel());
                         dialogInterface.dismiss();
                         setProgram();
                     }

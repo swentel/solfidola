@@ -43,6 +43,24 @@ public class Preferences {
     }
 
     /**
+     * Get a a string preference.
+     *
+     * @param context
+     *   The current context
+     * @param pref
+     *   The preference key
+     * @param DefaultValue
+     *   The default value
+     *
+     * @return
+     *   The preference
+     */
+    public static String getPreference(Context context, String pref, String DefaultValue) {
+        SharedPreferences preference = PreferenceManager.getDefaultSharedPreferences(context);
+        return preference.getString(pref, DefaultValue);
+    }
+
+    /**
      * Set an integer preference.
      *
      * @param context
