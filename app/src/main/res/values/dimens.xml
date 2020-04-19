@@ -7,7 +7,7 @@
     <dimen name="nav_header_height">150dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="big_text">20sp</dimen>
-    <dimen name="buttonMargin">10dp</dimen>
+    <dimen name="buttonMargin">15sp</dimen>
 
     <dimen name="tunerNoteSize">40sp</dimen>
     <dimen name="tunerPitchSize">20sp</dimen>

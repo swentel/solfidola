@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -27,8 +28,11 @@ public class MusicBarView extends ViewGroup {
     private final int NUM_WHITE_SPACES_LINE = 3; // number of white areas the child NoteView wants to cover
 
     private List<NoteData> notes;
+    private List<Integer> signatures;
     private float width, height, xTopLeft;
     private List<Float> linePositions;
+    private int clefWidth = 0;
+    private int signatureWidth = 0;
 
     private Paint musicBarBlack;
     private Context mContext;
@@ -51,6 +55,7 @@ public class MusicBarView extends ViewGroup {
         mContext = context;
         width = height = xTopLeft = 0;
         notes = new ArrayList<>();
+        signatures = new ArrayList<>();
         musicBarBlack = new Paint();
         musicBarBlack.setColor(Color.BLACK);
         musicBarBlack.setStyle(Paint.Style.FILL);
@@ -62,6 +67,9 @@ public class MusicBarView extends ViewGroup {
     @Override
     public void onDraw(Canvas canvas)
     {
+
+        Log.d("solfidola_debug", "onDraw method");
+
         // Draw all the black areas
         for (int i = 0; i < NUM_DEFINITE_BLACK_AREA; ++i)
         {
@@ -76,9 +84,17 @@ public class MusicBarView extends ViewGroup {
         canvas.drawLine(xTopLeft, yTop, xTopLeft, yBottom, musicBarBlack);
         canvas.drawLine(xTopRight, yTop, xTopRight, yBottom,  musicBarBlack);
 
+        int additionalWidth = clefWidth + signatureWidth;
+
         // Draw the bottom lines as necessary for the notes
         float noteBegin = xTopLeft + getPaddingLeft();
         float noteWidth = this.width / getChildCount();
+
+        // Since we have a clef and potential signature, the start of the first note
+        // is not the beginning.
+        noteBegin += noteWidth;
+
+        Log.d("solfidola_debug", "count: " + getChildCount() +  " - note-width: " + noteWidth);
         for(int i = 0; i < notes.size(); ++i)
         {
             float noteEnd = noteBegin + (this.width / MAX_NUM_NOTES);
@@ -103,6 +119,7 @@ public class MusicBarView extends ViewGroup {
     public void onLayout(boolean changed, int left, int top, int right, int bottom)
     {
         // TODO: Take advantage of changed????
+        Log.d("solfidola_debug", "onLayout method");
 
         // Recompute all the dimensions and locations of the black lines
         setup();
@@ -127,30 +144,47 @@ public class MusicBarView extends ViewGroup {
 
         // Change the positions of the children
         int itemWidth = (int) (this.width / getChildCount());
-        for(int i = 0, n = 0; i < getChildCount(); ++i)
+        for(int i = 0, n = 0, s = 0; i < getChildCount(); ++i)
         {
             View v = getChildAt(i);
-
-            if (i == 0) {
-                v.layout(10, 0, 80, 190);
-                continue;
-            }
 
             // get the bottom value of the NoteView based on the NoteValue in the list of notes
             float incrementValue = 0.5f*(blackLineHeight + whiteAreaHeight);
 
+            // ClefView.
+            if (i == 0 && getChildCount() > 2) {
+                v.layout(10, 0, 80, 190);
+                this.clefWidth = v.getMeasuredWidth();
+                continue;
+            }
+
+            // SignatureView.
+            if (getChildCount() == 6 && i > 0 && i < 4) {
+                int leftStartVal = (i * (40)) + getPaddingLeft() + (int) (this.width / MAX_NUM_NOTES) + 50;
+                int noteBottom = (int) (this.height - blackLineHeight - (signatures.get(s) * incrementValue)) + 20;
+                v.layout(leftStartVal, noteBottom - v.getMeasuredHeight(), leftStartVal + v.getMeasuredWidth(), noteBottom);
+                s++;
+                continue;
+            }
+
             int leftStartVal = (i * itemWidth) + getPaddingLeft() + (int) (this.width / MAX_NUM_NOTES * PERCENT_NOTE_PADDING_LEFT);
+
+            /*if (getChildCount() == 6) {
+                leftStartVal -= 350;
+            }*/
 
             // Notes higher than B are laid out differently
             if((notes.get(n).getNoteDuration() == NoteData.NoteDuration.WHOLE)
                     || !notes.get(n).getNoteValue().greaterThanHigherB())
             {
+                Log.d("solfidola_debug", "note: " + notes.get(n).getNoteValue().getValue());
                 // most possible bottom value for the note is this.height - blackLineHeight (because the lowest note is LOWER_B)
                 int noteBottom = (int) (this.height - blackLineHeight - (notes.get(n).getNoteValue().getValue() * incrementValue));
                 v.layout(leftStartVal, noteBottom - v.getMeasuredHeight(), leftStartVal + v.getMeasuredWidth(), noteBottom);
             }
             else
             {
+                Log.d("solfidola_debug", "note: " + notes.get(n).getNoteValue().getValue());
                 int noteTop = (int) (this.height - blackLineHeight
                         - (notes.get(n).getNoteValue().getValue() * incrementValue)
                         - (v.getMeasuredHeight() * PERCENT_NOTE_OVAL));
@@ -173,7 +207,13 @@ public class MusicBarView extends ViewGroup {
         // Set the height and width for every child
         for (int i = 0; i < getChildCount(); ++i)
         {
-            getChildAt(i).measure(wSpec, hSpec);
+            /*if (getChildCount() > 2 && i == 0) {
+                Log.d("solfidola_debug", "clef measure");
+                getChildAt(i).measure(clefwSpec, clefhSpec);
+            }
+            else {*/
+                getChildAt(i).measure(wSpec, hSpec);
+            //}
         }
     }
 
@@ -183,26 +223,35 @@ public class MusicBarView extends ViewGroup {
     {
         linePositions.clear(); // Need to do this to prevent a bunch of linePosition
 
-        for(int i = 0; i < getChildCount(); ++i)
-        {
+        for (int i = 0, n = 0; i < getChildCount(); ++i) {
             NoteView noteView;
+            SignatureView signatureView;
             String className = getChildAt(i).getClass().getSimpleName();
+
+            Log.d("solfidola_debug", "setup: " + className + " - " + i);
 
             switch (className) {
                 case "ClefView":
                     // We only have one, so no need to store anything.
                     break;
+                case "SignatureView":
+                    // We only have one, so no need to store anything.
+                    signatureView = (SignatureView) getChildAt(i);
+                    signatures.add(signatureView.getNote());
+                    break;
                 case "NoteView":
                     noteView = (NoteView) getChildAt(i);
                     // Get the type attributes and initialize a new NoteData and modify the element in
                     // the list as needed
-                    if (i < notes.size()) {
-                        notes.get(i).setNoteValue(noteView.getNoteValue());
-                        notes.get(i).setNoteDuration(noteView.getNoteDuration());
-                    } else {
-                        NoteData noteData = new NoteData(noteView.getNoteValue(), noteView.getNoteDuration());
-                        notes.add(noteData);
+                    try {
+                        notes.get(n).setNoteValue(noteView.getNoteValue());
+                        notes.get(n).setNoteDuration(noteView.getNoteDuration());
                     }
+                    catch (IndexOutOfBoundsException ignored) {
+                        NoteData noteData = new NoteData(noteView.getNoteValue(), noteView.getNoteDuration());
+                        notes.add(n, noteData);
+                    }
+                    n++;
                     break;
             }
         }

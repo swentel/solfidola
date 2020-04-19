@@ -47,19 +47,19 @@ public class NoteData {
         this.noteDuration = noteDuration;
     }
 
-    public NoteValue getNoteValue() {
+    NoteValue getNoteValue() {
         return this.noteValue;
     }
 
-    public void setNoteValue(NoteValue in) {
+    void setNoteValue(NoteValue in) {
         this.noteValue = in;
     }
 
-    public NoteDuration getNoteDuration() {
+    NoteDuration getNoteDuration() {
         return this.noteDuration;
     }
 
-    public void setNoteDuration(NoteDuration in) {
+    void setNoteDuration(NoteDuration in) {
         this.noteDuration = in;
     }
 }

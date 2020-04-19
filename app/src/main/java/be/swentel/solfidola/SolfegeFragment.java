@@ -39,6 +39,7 @@ import be.swentel.solfidola.SheetMusicView.ClefView;
 import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
+import be.swentel.solfidola.SheetMusicView.SignatureView;
 import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Preferences;
 import cn.sherlock.com.sun.media.sound.SF2Soundbank;
@@ -75,6 +76,7 @@ public class SolfegeFragment extends Fragment {
     private static final int DEFAULT_PROGRAM = 0;
     private static final int DEFAULT_CHOICES = 4;
     private static final String DEFAULT_INSTRUMENT = "Standard";
+    private static final String DEFAULT_SCALE = "Cmaj";
 
     @Nullable
     @Override
@@ -155,9 +157,11 @@ public class SolfegeFragment extends Fragment {
         if (clearBar) {
             bar.removeAllViews();
         }
+
         setPlaybackMode();
         setIntervals();
         drawClef();
+        //drawSignature();
         drawNotes();
         drawChoices();
     }
@@ -269,6 +273,19 @@ public class SolfegeFragment extends Fragment {
         bar.addView(clef);
     }
 
+    private void drawSignature() {
+        String scale = Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE);
+        if (scale.equals("Cmin")) {
+            // TODO use constants.
+            SignatureView s = new SignatureView(getContext(), "flat", 7);
+            bar.addView(s);
+            s = new SignatureView(getContext(), "flat", 10);
+            bar.addView(s);
+            s = new SignatureView(getContext(), "flat",6);
+            bar.addView(s);
+        }
+    }
+
     /**
      * Draw notes.
      */
@@ -293,7 +310,6 @@ public class SolfegeFragment extends Fragment {
         notes.remove(randomIndex);
 
         // Second note.
-        randomGenerator = new Random();
         randomIndex = randomGenerator.nextInt(notes.size());
         randomNotes.add(notes.get(randomIndex));
         notes.remove(randomIndex);
@@ -415,6 +431,22 @@ public class SolfegeFragment extends Fragment {
                 mDialog.show();
                 return true;
             case R.id.scale:
+                final CharSequence[] scales = {"Cmaj", "Cmin"};
+                mBuilder.setTitle(R.string.scale);
+                int currentScale = 0;
+                if (Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE).equals("Cmin")) {
+                    currentScale = 1;
+                }
+                mBuilder.setSingleChoiceItems(scales, currentScale, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Preferences.setPreference(getContext(), "scale", scales[i].toString());
+                        dialogInterface.dismiss();
+                        doRefresh();
+                    }
+                });
+                mDialog = mBuilder.create();
+                mDialog.show();
                 return true;
             case R.id.instrument:
                 int delta = 0;
