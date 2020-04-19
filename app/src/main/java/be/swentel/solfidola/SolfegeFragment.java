@@ -161,7 +161,7 @@ public class SolfegeFragment extends Fragment {
         setPlaybackMode();
         setIntervals();
         drawClef();
-        //drawSignature();
+        drawSignature();
         drawNotes();
         drawChoices();
     }
@@ -290,16 +290,29 @@ public class SolfegeFragment extends Fragment {
      * Draw notes.
      */
     private void drawNotes() {
-
         ArrayList<Note> notes = new ArrayList<>();
-        notes.add(new Note(60, LOWER_C));
-        notes.add(new Note(62, LOWER_D));
-        notes.add(new Note(64, LOWER_E));
-        notes.add(new Note(65, LOWER_F));
-        notes.add(new Note(67, LOWER_G));
-        notes.add(new Note(69, HIGHER_A));
-        notes.add(new Note(71, HIGHER_B));
-        notes.add(new Note(72, HIGHER_C));
+        String scale = Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE);
+
+        if (scale.equals("Cmin")) {
+            notes.add(new Note(60, LOWER_C));
+            notes.add(new Note(62, LOWER_D));
+            notes.add(new Note(63, LOWER_E));
+            notes.add(new Note(65, LOWER_F));
+            notes.add(new Note(67, LOWER_G));
+            notes.add(new Note(68, HIGHER_A));
+            notes.add(new Note(70, HIGHER_B));
+            notes.add(new Note(72, HIGHER_C));
+        }
+        else {
+            notes.add(new Note(60, LOWER_C));
+            notes.add(new Note(62, LOWER_D));
+            notes.add(new Note(64, LOWER_E));
+            notes.add(new Note(65, LOWER_F));
+            notes.add(new Note(67, LOWER_G));
+            notes.add(new Note(69, HIGHER_A));
+            notes.add(new Note(71, HIGHER_B));
+            notes.add(new Note(72, HIGHER_C));
+        }
 
         randomNotes.clear();
         Random randomGenerator = new Random();
@@ -386,11 +399,15 @@ public class SolfegeFragment extends Fragment {
     private void setIntervals() {
         intervals.clear();
         intervals.add(new Interval(2, "Secunde"));
-        intervals.add(new Interval(4, "Terts"));
+        intervals.add(new Interval(3, "Kl Terts"));
+        intervals.add(new Interval(4, "Gr. Terts"));
         intervals.add(new Interval(5, "Kwart"));
-        intervals.add(new Interval(7, "Kwint"));
-        intervals.add(new Interval(9, "Sext"));
-        intervals.add(new Interval(11, "Septiem"));
+        intervals.add(new Interval(6, "V. Kwint"));
+        intervals.add(new Interval(7, "R. Kwint"));
+        intervals.add(new Interval(8, "Kl. Sext"));
+        intervals.add(new Interval(9, "Gr. Sext"));
+        intervals.add(new Interval(10, "Kl. Septiem"));
+        intervals.add(new Interval(11, "Gr. Septiem"));
         intervals.add(new Interval(12, "Octaaf"));
     }
 
