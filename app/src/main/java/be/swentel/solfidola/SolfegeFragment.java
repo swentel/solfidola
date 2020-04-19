@@ -318,12 +318,11 @@ public class SolfegeFragment extends Fragment {
         Random randomGenerator = new Random();
 
         // First note
-        int randomIndex = randomGenerator.nextInt(notes.size());
-        randomNotes.add(notes.get(randomIndex));
-        notes.remove(randomIndex);
+        randomNotes.add(notes.get(0));
+        notes.remove(0);
 
         // Second note.
-        randomIndex = randomGenerator.nextInt(notes.size());
+        int randomIndex = randomGenerator.nextInt(notes.size());
         randomNotes.add(notes.get(randomIndex));
         notes.remove(randomIndex);
 
@@ -398,7 +397,8 @@ public class SolfegeFragment extends Fragment {
 
     private void setIntervals() {
         intervals.clear();
-        intervals.add(new Interval(2, "Secunde"));
+        intervals.add(new Interval(1, "Kl. Secunde"));
+        intervals.add(new Interval(2, "Gr. Secunde"));
         intervals.add(new Interval(3, "Kl Terts"));
         intervals.add(new Interval(4, "Gr. Terts"));
         intervals.add(new Interval(5, "Kwart"));
