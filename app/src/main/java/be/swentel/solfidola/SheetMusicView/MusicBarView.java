@@ -122,34 +122,42 @@ public class MusicBarView extends ViewGroup {
         }
 
         // Don't bother setting up child widths if there are no children
-        if(getChildCount() == 0)
+        if (getChildCount() == 0)
             return;
 
         // Change the positions of the children
         int itemWidth = (int) (this.width / getChildCount());
-        for(int i = 0; i < getChildCount(); ++i)
+        for(int i = 0, n = 0; i < getChildCount(); ++i)
         {
             View v = getChildAt(i);
+
+            if (i == 0) {
+                v.layout(10, 0, 80, 190);
+                continue;
+            }
+
             // get the bottom value of the NoteView based on the NoteValue in the list of notes
             float incrementValue = 0.5f*(blackLineHeight + whiteAreaHeight);
 
             int leftStartVal = (i * itemWidth) + getPaddingLeft() + (int) (this.width / MAX_NUM_NOTES * PERCENT_NOTE_PADDING_LEFT);
 
             // Notes higher than B are laid out differently
-            if((notes.get(i).getNoteDuration() == NoteData.NoteDuration.WHOLE)
-                    || !notes.get(i).getNoteValue().greaterThanHigherB())
+            if((notes.get(n).getNoteDuration() == NoteData.NoteDuration.WHOLE)
+                    || !notes.get(n).getNoteValue().greaterThanHigherB())
             {
                 // most possible bottom value for the note is this.height - blackLineHeight (because the lowest note is LOWER_B)
-                int noteBottom = (int) (this.height - blackLineHeight - (notes.get(i).getNoteValue().getValue() * incrementValue));
+                int noteBottom = (int) (this.height - blackLineHeight - (notes.get(n).getNoteValue().getValue() * incrementValue));
                 v.layout(leftStartVal, noteBottom - v.getMeasuredHeight(), leftStartVal + v.getMeasuredWidth(), noteBottom);
             }
             else
             {
                 int noteTop = (int) (this.height - blackLineHeight
-                        - (notes.get(i).getNoteValue().getValue() * incrementValue)
+                        - (notes.get(n).getNoteValue().getValue() * incrementValue)
                         - (v.getMeasuredHeight() * PERCENT_NOTE_OVAL));
                 v.layout(leftStartVal, noteTop, leftStartVal + v.getMeasuredWidth(), noteTop + v.getMeasuredHeight());
             }
+
+            n++;
         }
     }
 
@@ -169,15 +177,6 @@ public class MusicBarView extends ViewGroup {
         }
     }
 
-    // TODO: Take care of this function to make adding a note easier (add a child node)
-    public void addNote(NoteData note)
-    {
-        notes.add(note);
-        addView(new NoteView(mContext, note));
-        invalidate();
-    }
-
-
     // Set up the notes list to make sure it matches with the child views of this MusicBarView
     // Check that each child view is a NoteView
     private void setup()
@@ -187,25 +186,24 @@ public class MusicBarView extends ViewGroup {
         for(int i = 0; i < getChildCount(); ++i)
         {
             NoteView noteView;
-            try
-            {
-                noteView = (NoteView) getChildAt(i);
-            }
-            catch (ClassCastException e)
-            {
-                throw new ClassCastException("MusicBarView can only have children of type NoteView");
-            }
+            String className = getChildAt(i).getClass().getSimpleName();
 
-            // Get the type attributes and initialize a new NoteData and modify the element in the list as needed
-            if(i < notes.size())
-            {
-                notes.get(i).setNoteValue(noteView.getNoteValue());
-                notes.get(i).setNoteDuration(noteView.getNoteDuration());
-            }
-            else
-            {
-                NoteData noteData = new NoteData(noteView.getNoteValue(), noteView.getNoteDuration());
-                notes.add(noteData);
+            switch (className) {
+                case "ClefView":
+                    // We only have one, so no need to store anything.
+                    break;
+                case "NoteView":
+                    noteView = (NoteView) getChildAt(i);
+                    // Get the type attributes and initialize a new NoteData and modify the element in
+                    // the list as needed
+                    if (i < notes.size()) {
+                        notes.get(i).setNoteValue(noteView.getNoteValue());
+                        notes.get(i).setNoteDuration(noteView.getNoteDuration());
+                    } else {
+                        NoteData noteData = new NoteData(noteView.getNoteValue(), noteView.getNoteDuration());
+                        notes.add(noteData);
+                    }
+                    break;
             }
         }
     }

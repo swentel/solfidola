@@ -35,6 +35,7 @@ import java.util.Random;
 import be.swentel.solfidola.Model.Interval;
 import be.swentel.solfidola.Model.Note;
 import be.swentel.solfidola.Model.SolfidolaInstrument;
+import be.swentel.solfidola.SheetMusicView.ClefView;
 import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
@@ -107,7 +108,7 @@ public class SolfegeFragment extends Fragment {
             e.printStackTrace();
         }
 
-        setup();
+        setup(false);
 
         final Button play = view.findViewById(R.id.play);
         play.setOnClickListener(new View.OnClickListener() {
@@ -150,15 +151,19 @@ public class SolfegeFragment extends Fragment {
         return note;
     }
 
-    private void setup() {
+    private void setup(boolean clearBar) {
+        if (clearBar) {
+            bar.removeAllViews();
+        }
         setPlaybackMode();
         setIntervals();
+        drawClef();
         drawNotes();
         drawChoices();
     }
 
     private void doRefresh() {
-        setup();
+        setup(true);
     }
 
     private void setPlaybackMode() {
@@ -257,10 +262,17 @@ public class SolfegeFragment extends Fragment {
     }
 
     /**
+     * Draw clef.
+     */
+    private void drawClef() {
+        ClefView clef = new ClefView(getContext());
+        bar.addView(clef);
+    }
+
+    /**
      * Draw notes.
      */
     private void drawNotes() {
-        bar.removeAllViews();
 
         ArrayList<Note> notes = new ArrayList<>();
         notes.add(new Note(60, LOWER_C));
