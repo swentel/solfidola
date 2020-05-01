@@ -68,6 +68,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragment = new SolfegeFragment();
                 break;
 
+            case R.id.nav_exercises:
+                close = true;
+                fragment = new ExercisesFragment();
+                break;
+
             case R.id.nav_tuner:
                 close = true;
                 fragment = new TunerFragment();

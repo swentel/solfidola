@@ -8,4 +8,8 @@
     <color name="buttonDarkText">#fff</color>
     <color name="right">#8dc13a</color>
     <color name="wrong">#e70000</color>
+
+    <color name="listDividerColor">#ededed</color>
+    <color name="listBackgroundColor">#999999</color>
+
 </resources>

@@ -13,4 +13,6 @@
     <dimen name="tunerPitchSize">20sp</dimen>
     <dimen name="tunerInstruction">18sp</dimen>
     <dimen name="tunerFeedback">18sp</dimen>
+
+    <dimen name="list_divider_height">1dp</dimen>
 </resources>

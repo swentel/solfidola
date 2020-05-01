@@ -11,6 +11,11 @@
             android:title="@string/menu_solfege" />
 
         <item
+            android:id="@+id/nav_exercises"
+            android:icon="@drawable/hearing"
+            android:title="@string/menu_exercise" />
+
+        <item
             android:id="@+id/nav_tuner"
             android:icon="@android:drawable/ic_btn_speak_now"
             android:title="@string/menu_tuner" />
