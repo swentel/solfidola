@@ -110,8 +110,6 @@ public class SolfegeFragment extends Fragment {
             e.printStackTrace();
         }
 
-        setup(false);
-
         final Button play = view.findViewById(R.id.play);
         play.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -139,11 +137,18 @@ public class SolfegeFragment extends Fragment {
             }
         });*/
 
-        //choicesContainer.post(new Runnable() {
-        //    public void run() {
-        //        play(randomNotes);
-        //    }
-        //});
+        setup(false);
+        playNotes();
+    }
+
+    private void playNotes() {
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                play(randomNotes);
+            }
+        }, 500);
     }
 
     private NoteView getNote(NoteData.NoteValue value) {
@@ -168,6 +173,7 @@ public class SolfegeFragment extends Fragment {
 
     private void doRefresh() {
         setup(true);
+        playNotes();
     }
 
     private void setPlaybackMode() {
