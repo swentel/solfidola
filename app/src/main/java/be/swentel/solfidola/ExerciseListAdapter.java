@@ -89,12 +89,11 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
 
             holder.position = position;
 
-            // Color of row.
+            // Color of row
             int color = context.getResources().getColor(R.color.listRowBackgroundColor);
             holder.row.setBackgroundColor(color);
 
             // Label
-            String label = exercise.getData();
             ArrayList<Interval> intervals = Intervals.list(exercise.getIntervals());
             ArrayList<String> text = new ArrayList<>();
             for (Interval i : intervals) {
@@ -102,7 +101,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             }
             holder.label.setText(String.format(context.getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
 
-            // Published.
+            // Published
             @SuppressLint("SimpleDateFormat")
             SimpleDateFormat formatIn = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             @SuppressLint("SimpleDateFormat")
