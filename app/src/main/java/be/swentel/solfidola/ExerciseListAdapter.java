@@ -19,10 +19,13 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import be.swentel.solfidola.Model.Exercise;
+import be.swentel.solfidola.Model.Interval;
+import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.db.DatabaseHelper;
 
 public class ExerciseListAdapter extends BaseAdapter implements OnClickListener {
@@ -92,7 +95,12 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
 
             // Label
             String label = exercise.getData();
-            holder.label.setText(label);
+            ArrayList<Interval> intervals = Intervals.list(exercise.getIntervals());
+            ArrayList<String> text = new ArrayList<>();
+            for (Interval i : intervals) {
+                text.add(i.getLabel());
+            }
+            holder.label.setText(String.format(context.getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
 
             // Published.
             @SuppressLint("SimpleDateFormat")
@@ -102,7 +110,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             try {
                 holder.date.setVisibility(View.VISIBLE);
                 Date result = formatIn.parse(exercise.getTimestamp());
-                //holder.date.setText(String.format(context.getString(R.string.draft_last_edit), draft.getType(), formatOut.format(result)));
+                holder.date.setText(String.format(context.getString(R.string.exercise_last_test), formatOut.format(result)));
             }
             catch (ParseException ignored) {
                 holder.date.setVisibility(View.GONE);

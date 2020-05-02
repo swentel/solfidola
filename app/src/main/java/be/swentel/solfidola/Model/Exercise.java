@@ -26,6 +26,7 @@ public class Exercise extends Record {
      * Prepare data.
      *
      * @param data
+     *   The data from the storage.
      */
     public void prepareData(String data) {
         this.setData(data);

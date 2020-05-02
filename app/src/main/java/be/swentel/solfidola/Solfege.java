@@ -97,11 +97,9 @@ public class Solfege extends Fragment {
         if (getArguments() != null) {
             int exerciseId = getArguments().getInt("exercise");
             if (exerciseId > 0) {
-                DatabaseHelper db = new DatabaseHelper(getContext());
                 exercise = view.findViewById(R.id.exercise);
+                DatabaseHelper db = new DatabaseHelper(getContext());
                 e = db.getExercise(exerciseId);
-                exercise.setVisibility(View.VISIBLE);
-                exercise.setText(String.format(getString(R.string.exercise), e.getData()));
             }
         }
 
@@ -475,6 +473,12 @@ public class Solfege extends Fragment {
 
         if (e != null) {
             intervals = Intervals.list(e.getIntervals());
+            exercise.setVisibility(View.VISIBLE);
+            ArrayList<String> text = new ArrayList<>();
+            for (Interval i : intervals) {
+                text.add(i.getLabel());
+            }
+            exercise.setText(String.format(getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
         }
         else {
             intervals = Intervals.list();
