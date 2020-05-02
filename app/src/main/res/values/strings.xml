@@ -16,8 +16,12 @@
     <string name="instrument_selected">Instrument: %s</string>
     <string name="playback_mode">Playback mode: %s</string>
     <string name="instrument">Instrument</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
 
     <string name="no_exercises">No exercises, create your first!</string>
+    <string name="exercise_delete_confirm">Are you sure you want to delete this exercise?</string>
+    <string name="exercise_deleted">Exercise deleted</string>
 
     <string name="number_of_choices">Number of choices</string>
     <string name="play">Play</string>

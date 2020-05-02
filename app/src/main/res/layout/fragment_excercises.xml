@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/channel_root"
+    android:id="@+id/layout_root"
     android:layout_width="match_parent"
     android:layout_height="fill_parent"
-    android:padding="10dp"
     android:orientation="vertical">
-
 
     <ListView
         android:divider="@color/listDividerColor"
         android:dividerHeight="@dimen/list_divider_height"
         android:background="@color/listBackgroundColor"
-        android:id="@+id/channel_list"
+        android:id="@+id/exercise_list"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />
 
@@ -22,7 +20,7 @@
         android:layout_centerHorizontal="true"
         android:padding="10dp"
         android:visibility="gone"
-        android:id="@+id/noOxercises"
+        android:id="@+id/no_exercises"
         android:textColor="@color/textColor"
         android:text="@string/no_exercises"
         android:layout_width="wrap_content"

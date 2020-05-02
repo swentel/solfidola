@@ -9,7 +9,10 @@
     <color name="right">#8dc13a</color>
     <color name="wrong">#e70000</color>
 
-    <color name="listDividerColor">#ededed</color>
-    <color name="listBackgroundColor">#999999</color>
+    <color name="listBackgroundColor">#f5f5f5</color>
+    <color name="listDividerColor">#e2e6e9</color>
+    <color name="buttonBackground">#ebf2f7</color>
+    <color name="listRowBackgroundColor">#ffffff</color>
+    <color name="listRowBackgroundColorTouched">#e2e6e9</color>
 
 </resources>
