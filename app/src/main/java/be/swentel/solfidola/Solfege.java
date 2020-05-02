@@ -93,6 +93,7 @@ public class Solfege extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        String title = getString(R.string.menu_solfege);
         // Start exercise.
         if (getArguments() != null) {
             int exerciseId = getArguments().getInt("exercise");
@@ -100,8 +101,10 @@ public class Solfege extends Fragment {
                 exercise = view.findViewById(R.id.exercise);
                 DatabaseHelper db = new DatabaseHelper(getContext());
                 e = db.getExercise(exerciseId);
+                title = getString(R.string.exercising);
             }
         }
+        requireActivity().setTitle(title);
 
         bar = view.findViewById(R.id.bar);
         playbackMode = view.findViewById(R.id.playbackMode);

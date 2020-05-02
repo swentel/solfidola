@@ -34,12 +34,10 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
     private final List<Exercise> exercises;
     private LayoutInflater mInflater;
     private RelativeLayout layout;
-    private ExerciseList.OnExercisesChangedListener callback;
 
-    ExerciseListAdapter(Context context, List<Exercise> exercises, ExerciseList.OnExercisesChangedListener callback, RelativeLayout layout) {
+    ExerciseListAdapter(Context context, List<Exercise> exercises, RelativeLayout layout) {
         this.context = context;
         this.exercises = exercises;
-        this.callback = callback;
         this.layout = layout;
         this.mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
@@ -160,7 +158,6 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
                     db.deleteRecordById(e.getId());
                     exercises.remove(position);
                     notifyDataSetChanged();
-                    //callback.onExercisesChanged();
                     Snackbar.make(layout, context.getString(R.string.exercise_deleted), Snackbar.LENGTH_SHORT).show();
                 }
             });

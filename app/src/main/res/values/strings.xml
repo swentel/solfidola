@@ -28,6 +28,7 @@
     <string name="exercise_created">Exercise created</string>
     <string name="exercise">Exercise: %s</string>
     <string name="exercise_last_test">Last test: %s</string>
+    <string name="exercising">Exercising</string>
 
     <string name="number_of_choices">Number of choices</string>
     <string name="play">Play</string>

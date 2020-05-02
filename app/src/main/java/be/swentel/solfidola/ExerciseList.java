@@ -13,7 +13,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import java.util.List;
 
@@ -23,16 +22,6 @@ import be.swentel.solfidola.db.DatabaseHelper;
 import static be.swentel.solfidola.MainActivity.CREATE_EXERCISE;
 
 public class ExerciseList extends Fragment implements View.OnClickListener {
-
-    private OnExercisesChangedListener callback;
-
-    public void OnExercisesChangedListener(OnExercisesChangedListener callback) {
-        this.callback = callback;
-    }
-
-    public interface OnExercisesChangedListener {
-        void onExercisesChanged();
-    }
 
     @Nullable
     @Override
@@ -61,7 +50,7 @@ public class ExerciseList extends Fragment implements View.OnClickListener {
             empty.setOnClickListener(this);
         }
         else {
-            ExerciseListAdapter adapter = new ExerciseListAdapter(requireContext(), exercises, callback, layout);
+            ExerciseListAdapter adapter = new ExerciseListAdapter(requireContext(), exercises, layout);
             exerercise.setAdapter(adapter);
             adapter.notifyDataSetChanged();
         }
