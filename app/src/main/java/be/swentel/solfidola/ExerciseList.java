@@ -58,6 +58,7 @@ public class ExerciseList extends Fragment implements View.OnClickListener {
         if (exercises.size() == 0) {
             exerercise.setVisibility(View.GONE);
             empty.setVisibility(View.VISIBLE);
+            empty.setOnClickListener(this);
         }
         else {
             ExerciseListAdapter adapter = new ExerciseListAdapter(requireContext(), exercises, callback, layout);

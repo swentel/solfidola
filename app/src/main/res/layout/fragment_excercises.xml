@@ -19,6 +19,7 @@
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:padding="10dp"
         android:visibility="gone"
+        android:textSize="@dimen/big_text"
         android:id="@+id/no_exercises"
         android:textColor="@color/textColor"
         android:text="@string/no_exercises"

@@ -274,6 +274,7 @@ public class Solfege extends Fragment {
 
         TableRow row = null;
         int numberOfButtons = 0;
+        // TODO shuffle in order of interval in case there's an exercise
         Collections.shuffle(choices);
         for (Button choice: choices) {
 
