@@ -32,6 +32,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 
+import be.swentel.solfidola.Model.Exercise;
 import be.swentel.solfidola.Model.Interval;
 import be.swentel.solfidola.Model.Note;
 import be.swentel.solfidola.Model.SolfidolaInstrument;
@@ -41,7 +42,9 @@ import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
 import be.swentel.solfidola.SheetMusicView.SignatureView;
 import be.swentel.solfidola.Utility.Debug;
+import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.Utility.Preferences;
+import be.swentel.solfidola.db.DatabaseHelper;
 import cn.sherlock.com.sun.media.sound.SF2Soundbank;
 import cn.sherlock.com.sun.media.sound.SoftSynthesizer;
 import jp.kshoji.javax.sound.midi.Instrument;
@@ -60,13 +63,15 @@ import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_E;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_F;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_G;
 
-public class SolfegeFragment extends Fragment {
+public class Solfege extends Fragment {
 
+    private Exercise e = null;
     private int interval = 1;
     private Receiver receiver;
     private SoftSynthesizer synthesizer;
     private TextView playbackMode;
     private TextView instrument;
+    private TextView exercise;
     private MusicBarView bar;
     private TableLayout choicesContainer;
     private ArrayList<Note> randomNotes = new ArrayList<>();
@@ -81,12 +86,24 @@ public class SolfegeFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_solfege, container, false);
+        return inflater.inflate(R.layout.solfege, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        // Start exercise.
+        if (getArguments() != null) {
+            int exerciseId = getArguments().getInt("exercise");
+            if (exerciseId > 0) {
+                DatabaseHelper db = new DatabaseHelper(getContext());
+                exercise = view.findViewById(R.id.exercise);
+                e = db.getExercise(exerciseId);
+                exercise.setVisibility(View.VISIBLE);
+                exercise.setText(String.format(getString(R.string.exercise), e.getData()));
+            }
+        }
 
         bar = view.findViewById(R.id.bar);
         playbackMode = view.findViewById(R.id.playbackMode);
@@ -195,6 +212,12 @@ public class SolfegeFragment extends Fragment {
 
         Button b;
         int numberOfChoices = Preferences.getPreference(getContext(), "numberOfChoices", DEFAULT_CHOICES);
+
+        // Limit choices to the number of intervals in the exercise.
+        if (e != null) {
+            numberOfChoices = e.getIntervals().size();
+        }
+
         ArrayList<Button> choices = new ArrayList<>();
 
         // Solution
@@ -299,25 +322,67 @@ public class SolfegeFragment extends Fragment {
         ArrayList<Note> notes = new ArrayList<>();
         String scale = Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE);
 
-        if (scale.equals("Cmin")) {
+        if (e != null) {
             notes.add(new Note(60, LOWER_C));
-            notes.add(new Note(62, LOWER_D));
-            notes.add(new Note(63, LOWER_E));
-            notes.add(new Note(65, LOWER_F));
-            notes.add(new Note(67, LOWER_G));
-            notes.add(new Note(68, HIGHER_A));
-            notes.add(new Note(70, HIGHER_B));
-            notes.add(new Note(72, HIGHER_C));
+
+            if (e.getIntervals().contains(1)) {
+                notes.add(new Note(61, LOWER_C));
+            }
+            if (e.getIntervals().contains(2)) {
+                notes.add(new Note(62, LOWER_D));
+            }
+            if (e.getIntervals().contains(3)) {
+                notes.add(new Note(63, LOWER_D));
+            }
+            if (e.getIntervals().contains(4)) {
+                notes.add(new Note(64, LOWER_E));
+            }
+            if (e.getIntervals().contains(5)) {
+                notes.add(new Note(65, LOWER_F));
+            }
+            if (e.getIntervals().contains(6)) {
+                notes.add(new Note(66, LOWER_G));
+            }
+            if (e.getIntervals().contains(7)) {
+                notes.add(new Note(67, LOWER_G));
+            }
+            if (e.getIntervals().contains(8)) {
+                notes.add(new Note(68, HIGHER_A));
+            }
+            if (e.getIntervals().contains(9)) {
+                notes.add(new Note(69, HIGHER_A));
+            }
+            if (e.getIntervals().contains(10)) {
+                notes.add(new Note(70, HIGHER_B));
+            }
+            if (e.getIntervals().contains(11)) {
+                notes.add(new Note(71, HIGHER_B));
+            }
+            if (e.getIntervals().contains(12)) {
+                notes.add(new Note(72, HIGHER_C));
+            }
         }
         else {
-            notes.add(new Note(60, LOWER_C));
-            notes.add(new Note(62, LOWER_D));
-            notes.add(new Note(64, LOWER_E));
-            notes.add(new Note(65, LOWER_F));
-            notes.add(new Note(67, LOWER_G));
-            notes.add(new Note(69, HIGHER_A));
-            notes.add(new Note(71, HIGHER_B));
-            notes.add(new Note(72, HIGHER_C));
+            if (scale.equals("Cmin")) {
+                notes.add(new Note(60, LOWER_C));
+                notes.add(new Note(62, LOWER_D));
+                notes.add(new Note(63, LOWER_E));
+                notes.add(new Note(65, LOWER_F));
+                notes.add(new Note(67, LOWER_G));
+                notes.add(new Note(68, HIGHER_A));
+                notes.add(new Note(70, HIGHER_B));
+                notes.add(new Note(72, HIGHER_C));
+            }
+            else {
+                notes.add(new Note(60, LOWER_C));
+                notes.add(new Note(62, LOWER_D));
+                notes.add(new Note(64, LOWER_E));
+                notes.add(new Note(65, LOWER_F));
+                notes.add(new Note(67, LOWER_G));
+                notes.add(new Note(69, HIGHER_A));
+                notes.add(new Note(71, HIGHER_B));
+                notes.add(new Note(72, HIGHER_C));
+            }
         }
 
         randomNotes.clear();
@@ -338,6 +403,10 @@ public class SolfegeFragment extends Fragment {
         for (Note n : randomNotes) {
             NoteView note = getNote(n.getNoteViewValue());
             bar.addView(note);
+        }
+
+        if (e != null) {
+            bar.setVisibility(View.GONE);
         }
 
     }
@@ -403,18 +472,13 @@ public class SolfegeFragment extends Fragment {
 
     private void setIntervals() {
         intervals.clear();
-        intervals.add(new Interval(1, "Kl. Secunde"));
-        intervals.add(new Interval(2, "Gr. Secunde"));
-        intervals.add(new Interval(3, "Kl Terts"));
-        intervals.add(new Interval(4, "Gr. Terts"));
-        intervals.add(new Interval(5, "Kwart"));
-        intervals.add(new Interval(6, "V. Kwint"));
-        intervals.add(new Interval(7, "R. Kwint"));
-        intervals.add(new Interval(8, "Kl. Sext"));
-        intervals.add(new Interval(9, "Gr. Sext"));
-        intervals.add(new Interval(10, "Kl. Septiem"));
-        intervals.add(new Interval(11, "Gr. Septiem"));
-        intervals.add(new Interval(12, "Octaaf"));
+
+        if (e != null) {
+            intervals = Intervals.list(e.getIntervals());
+        }
+        else {
+            intervals = Intervals.list();
+        }
     }
 
     @Override

@@ -20,6 +20,14 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ExerciseForm"
+            android:label="@string/exercise_new"
+            android:parentActivityName=".LaunchActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="be.swentel.solfidola.LaunchActivity" />
+        </activity>
     </application>
 
 </manifest>

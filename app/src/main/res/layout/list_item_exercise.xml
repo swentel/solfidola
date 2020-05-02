@@ -21,7 +21,8 @@
         android:textSize="@dimen/list_item_text_size"
         android:layout_width="fill_parent" />
 
-    <LinearLayout
+    <RelativeLayout
+        android:paddingTop="10dp"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -35,14 +36,14 @@
             android:layout_height="@dimen/list_item_icon_size" />
 
         <Button
+            android:layout_alignParentEnd="true"
             android:background="@drawable/button_delete"
             android:id="@+id/delete"
             android:hint="@string/delete"
             android:textColorHint="@android:color/transparent"
             android:layout_width="@dimen/list_item_icon_size"
-            android:layout_height="@dimen/list_item_icon_size"
-            android:layout_marginStart="@dimen/list_item_icon_margin_left" />
+            android:layout_height="@dimen/list_item_icon_size" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

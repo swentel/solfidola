@@ -3,7 +3,6 @@ package be.swentel.solfidola;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -32,9 +31,9 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
     private final List<Exercise> exercises;
     private LayoutInflater mInflater;
     private RelativeLayout layout;
-    private ExercisesFragment.OnExercisesChangedListener callback;
+    private ExerciseList.OnExercisesChangedListener callback;
 
-    ExerciseListAdapter(Context context, List<Exercise> exercises, ExercisesFragment.OnExercisesChangedListener callback, RelativeLayout layout) {
+    ExerciseListAdapter(Context context, List<Exercise> exercises, ExerciseList.OnExercisesChangedListener callback, RelativeLayout layout) {
         this.context = context;
         this.exercises = exercises;
         this.callback = callback;
@@ -92,16 +91,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             holder.row.setBackgroundColor(color);
 
             // Label
-            String label = "";
-            /*if (draft.getName().length() > 0) {
-                label = draft.getName();
-            }
-            else if (draft.getBody().length() > 0) {
-                label = draft.getBody();
-            }
-            if (label.length() > 40) {
-                label = label.substring(0, 40) + " ...";
-            }*/
+            String label = exercise.getData();
             holder.label.setText(label);
 
             // Published.
@@ -138,7 +128,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
         @Override
         public void onClick(View v) {
             Exercise exercise = exercises.get(this.position);
-            Intent startActivity = null;
+            ((MainActivity)context).startExercise(exercise.getId());
         }
     }
 
@@ -153,17 +143,17 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
 
         @Override
         public void onClick(View v) {
-            final Exercise draft = exercises.get(this.position);
+            final Exercise e = exercises.get(this.position);
 
             final AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle(context.getString(R.string.exercise_delete_confirm));
             builder.setPositiveButton(context.getString(R.string.delete),new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog,int id) {
                     DatabaseHelper db = new DatabaseHelper(context);
-                    db.deleteRecordById(draft.getId());
+                    db.deleteRecordById(e.getId());
                     exercises.remove(position);
                     notifyDataSetChanged();
-                    callback.onExercisesChanged();
+                    //callback.onExercisesChanged();
                     Snackbar.make(layout, context.getString(R.string.exercise_deleted), Snackbar.LENGTH_SHORT).show();
                 }
             });

@@ -1,5 +1,6 @@
 package be.swentel.solfidola.db;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -14,7 +15,7 @@ import be.swentel.solfidola.Model.Record;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DATA_TYPE_EXERCISE = "exercise";
+    public static final String DATA_TYPE_EXERCISE = "exercise";
 
     private static final int DATABASE_VERSION = 1;
     private static final String DATABASE_NAME = "solfidola";
@@ -57,14 +58,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(COLUMN_TYPE, record.getType());
-        values.put(COLUMN_TIMESTAMP, record.getTimestamp());
         values.put(COLUMN_DATA, record.getData());
 
         if (record.getId() > 0) {
             db.update(TABLE_DATA_NAME, values, COLUMN_ID + "=" + record.getId(), null);
         }
         else {
-            db.insert(TABLE_DATA_NAME, null, values);
+            long id = db.insert(TABLE_DATA_NAME, null, values);
+            record.setId((int) id);
         }
         db.close();
     }
@@ -122,7 +123,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *
      * @return Record
      */
-    public Record getRecord(long id) {
+    private Record getRecord(long id) {
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_DATA_NAME,
@@ -185,6 +186,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      * @return int
      *   The number of records.
      */
+    @SuppressLint("Recycle")
     public int getRecordCountByType(String type) {
         int count = 0;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -205,7 +207,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public List<Exercise> getExercises() {
         List<Exercise> exercises = new ArrayList<>();
         List<Record> records = this.getRecordsByType(DATA_TYPE_EXERCISE);
+        for (Record r : records) {
+            Exercise e = new Exercise();
+            e.setId(r.getId());
+            e.setType(DATA_TYPE_EXERCISE);
+            e.setTimestamp(r.getTimestamp());
+            e.prepareData(r.getData());
+            exercises.add(e);
+        }
         return exercises;
+    }
+
+    /**
+     * Get a single exercise.
+     *
+     * @return List<Exercise>
+     */
+    public Exercise getExercise(long id) {
+        Record r = this.getRecord(id);
+        Exercise e = new Exercise();
+        e.setId(r.getId());
+        e.setType(DATA_TYPE_EXERCISE);
+        e.setTimestamp(r.getTimestamp());
+        e.prepareData(r.getData());
+        return e;
     }
 
     /**
@@ -215,11 +240,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      *   An exercise object.
      */
     public void saveExercise(Exercise exercise) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        Record record = new Record();
-        record.setType(DATA_TYPE_EXERCISE);
-        //record.setTimestamp();
-        saveRecord(record);
+        saveRecord(exercise);
     }
 
 }
