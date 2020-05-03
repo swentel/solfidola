@@ -868,6 +868,10 @@ public class Solfege extends Fragment implements RecognitionListener {
             catch (Exception ignored) {}
         }
 
+        if (s.equals("play")) {
+            play(randomNotes);
+        }
+
         speechMatchIsChecking = false;
     }
 
