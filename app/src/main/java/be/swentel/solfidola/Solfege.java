@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -128,19 +129,11 @@ public class Solfege extends Fragment {
             e.printStackTrace();
         }
 
-        final Button play = view.findViewById(R.id.play);
+        final ImageButton play = view.findViewById(R.id.play);
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 play(randomNotes);
-            }
-        });
-
-        Button refresh = view.findViewById(R.id.refresh);
-        refresh.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                doRefresh();
             }
         });
 
@@ -189,7 +182,7 @@ public class Solfege extends Fragment {
         drawChoices();
     }
 
-    private void doRefresh() {
+    private void doRenew() {
         setup(true);
         playNotes();
     }
@@ -219,7 +212,7 @@ public class Solfege extends Fragment {
             numberOfChoices = e.getIntervals().size();
         }
 
-        ArrayList<Button> choices = new ArrayList<>();
+        List<Button> choices = new ArrayList<>();
 
         // Solution
         int solution = 0;
@@ -235,6 +228,7 @@ public class Solfege extends Fragment {
 
         b = new Button(getContext());
         b.setText(intervals.get(solution).getLabel());
+        b.setTag(intervals.get(solution).getInterval());
         b.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         b.setTextColor(getResources().getColor(R.color.buttonDarkText));
         b.setOnClickListener(new View.OnClickListener() {
@@ -245,7 +239,7 @@ public class Solfege extends Fragment {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            doRefresh();
+                            doRenew();
                         }
                     }, Preferences.getPreference(getContext(), "autoRefreshDelay", 2) * 1000);
                 }
@@ -270,6 +264,7 @@ public class Solfege extends Fragment {
                     v.setBackgroundColor(getResources().getColor(R.color.wrong));
                 }
             });
+            b.setTag(intervals.get(randomIndex).getInterval());
             choices.add(b);
             intervals.remove(randomIndex);
             numberOfChoices--;
@@ -277,8 +272,25 @@ public class Solfege extends Fragment {
 
         TableRow row = null;
         int numberOfButtons = 0;
-        // TODO shuffle in order of interval in case there's an exercise
-        Collections.shuffle(choices);
+
+        // In an exercise, sort by interval asc, otherwise random.
+        if (e != null) {
+            Collections.sort(choices, new Comparator<Button>() {
+                @Override
+                public int compare(Button b1, Button b2) {
+                    Integer i1 = (Integer) b1.getTag();
+                    Integer i2 = (Integer) b2.getTag();
+                    if (i1.equals(i2)) {
+                        return 0;
+                    }
+                    return (i1 < i2) ? -1 : 1;
+
+                }
+            });
+        }
+        else {
+            Collections.shuffle(choices);
+        }
         for (Button choice: choices) {
 
             if ((numberOfButtons % 3) == 0) {
@@ -321,6 +333,11 @@ public class Solfege extends Fragment {
      * Draw notes.
      */
     private void drawNotes() {
+        boolean showBar = Preferences.getPreference(getContext(), "show_bar", true);
+        if (e != null) {
+            showBar = e.showBar();
+        }
+
         ArrayList<Note> notes = new ArrayList<>();
         String scale = Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE);
 
@@ -402,12 +419,14 @@ public class Solfege extends Fragment {
         // Get interval.
         interval = randomNotes.get(1).getMidiValue() - randomNotes.get(0).getMidiValue();
 
-        for (Note n : randomNotes) {
-            NoteView note = getNote(n.getNoteViewValue());
-            bar.addView(note);
+        if (showBar) {
+            bar.setVisibility(View.VISIBLE);
+            for (Note n : randomNotes) {
+                NoteView note = getNote(n.getNoteViewValue());
+                bar.addView(note);
+            }
         }
-
-        if (e != null) {
+        else {
             bar.setVisibility(View.GONE);
         }
 
@@ -518,10 +537,24 @@ public class Solfege extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Preferences.setPreference(getContext(), "playback", i);
                         dialogInterface.dismiss();
-                        doRefresh();
+                        doRenew();
                     }
                 });
 
+                mDialog = mBuilder.create();
+                mDialog.show();
+                return true;
+            case R.id.sheetMusic:
+                mBuilder.setTitle(R.string.bar);
+                boolean[] checked = new boolean[] {Preferences.getPreference(getContext(), "show_bar", true)};
+                mBuilder.setMultiChoiceItems(new String[]{getString(R.string.show_bar)}, checked, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                        Preferences.setPreference(getContext(), "show_bar", b);
+                        dialogInterface.dismiss();
+                        doRenew();
+                    }
+                });
                 mDialog = mBuilder.create();
                 mDialog.show();
                 return true;
@@ -537,7 +570,7 @@ public class Solfege extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Preferences.setPreference(getContext(), "scale", scales[i].toString());
                         dialogInterface.dismiss();
-                        doRefresh();
+                        doRenew();
                     }
                 });
                 mDialog = mBuilder.create();
@@ -595,7 +628,7 @@ public class Solfege extends Fragment {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Preferences.setPreference(getContext(), "numberOfChoices", Integer.parseInt(numberOfChoices[i].toString()));
                         dialogInterface.dismiss();
-                        doRefresh();
+                        doRenew();
                     }
                 });
 

@@ -7,6 +7,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/sheetMusic"
+        android:title="@string/bar"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/playback"
         android:title="@string/playback"
         app:showAsAction="never" />

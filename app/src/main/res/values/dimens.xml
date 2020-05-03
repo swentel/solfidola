@@ -13,6 +13,7 @@
     <dimen name="tunerPitchSize">20sp</dimen>
     <dimen name="tunerInstruction">18sp</dimen>
     <dimen name="tunerFeedback">18sp</dimen>
+    <dimen name="actionButtonSize">40dp</dimen>
 
     <dimen name="list_item_padding">15sp</dimen>
     <dimen name="list_item_text_size">16sp</dimen>

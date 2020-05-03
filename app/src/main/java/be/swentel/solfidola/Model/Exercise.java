@@ -10,6 +10,7 @@ import static be.swentel.solfidola.db.DatabaseHelper.DATA_TYPE_EXERCISE;
 
 public class Exercise extends Record {
 
+    private boolean showBar = false;
     private ArrayList<Integer> intervals = new ArrayList<>();
 
     public Exercise() {
@@ -22,6 +23,15 @@ public class Exercise extends Record {
 
     public void addInterval(Integer interval) {
         intervals.add(interval);
+    }
+
+    /**
+     * Whether to show the bar or not.
+     *
+     * @return boolean
+     */
+    public boolean showBar() {
+        return showBar;
     }
 
     /**
@@ -42,6 +52,9 @@ public class Exercise extends Record {
         catch (JSONException ignored) { }
     }
 
+    /**
+     * Flat data.
+     */
     public void flattenData() {
         JSONObject o = new JSONObject();
         JSONArray i = new JSONArray();

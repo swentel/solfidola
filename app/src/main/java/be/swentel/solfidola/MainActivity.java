@@ -81,9 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        Log.d("solfidola_debug", "ok");
         if (item.getItemId() == android.R.id.home) {
-            Log.d("solfidola_debug", "JOOOOO");
             //getSupportFragmentManager().popBackStack();
             return true;
         }

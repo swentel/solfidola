@@ -48,24 +48,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <Button
+        <ImageButton
             android:id="@+id/play"
-            android:text="@string/play"
-            android:textColor="@color/buttonDarkText"
-            android:background="@color/colorPrimaryDark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:ignore="ButtonStyle" />
-
-        <Button
-            android:layout_marginStart="@dimen/buttonMargin"
-            android:id="@+id/refresh"
-            android:text="@string/refresh"
-            android:textColor="@color/buttonDarkText"
-            android:background="@color/colorPrimaryDark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:ignore="ButtonStyle" />
+            android:background="@drawable/play"
+            android:layout_width="@dimen/actionButtonSize"
+            android:layout_height="@dimen/actionButtonSize"
+            android:contentDescription="@string/play" />
 
         <!--<Button
             android:id="@+id/listen"
