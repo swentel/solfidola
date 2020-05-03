@@ -6,6 +6,10 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
 
+    <string name="no">No</string>
+    <string name="yes">yes</string>
+    <string name="close">Close</string>
+    <string name="speech_info">Speech: %s</string>
     <string name="drawer_title">Menu</string>
     <string name="menu_solfege">Solfege</string>
     <string name="menu_exercise">Exercises</string>
@@ -20,17 +24,24 @@
     <string name="instrument">Instrument</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="mic">Microphone</string>
+    <string name="error_listener">Error listener: %s</string>
+    <string name="error_setup">Error setup: %s</string>
+    <string name="timeout">Timeout on speech</string>
 
     <string name="no_exercises">No exercises, create your first!</string>
     <string name="exercise_delete_confirm">Are you sure you want to delete this exercise?</string>
     <string name="exercise_deleted">Exercise deleted</string>
     <string name="exercise_new">New exercise</string>
     <string name="start">Start</string>
-    <string name="interval_empty">Select at least one interval</string>
+    <string name="interval_select">Select at least two intervals</string>
     <string name="exercise_created">Exercise created</string>
     <string name="exercise">Exercise: %s</string>
     <string name="exercise_last_test">Last test: %s</string>
     <string name="exercising">Exercising</string>
+    <string name="match_exact">Exact match: %s</string>
+    <string name="match_partial">Partial match: %s</string>
+    <string name="listening">Listening …</string>
 
     <string name="number_of_choices">Number of choices</string>
     <string name="play">Play</string>

@@ -1,11 +1,11 @@
 package be.swentel.solfidola;
 
-import android.content.ActivityNotFoundException;
+import android.Manifest;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.speech.RecognizerIntent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -23,9 +23,22 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.kaldi.Assets;
+import org.kaldi.Model;
+import org.kaldi.RecognitionListener;
+import org.kaldi.SpeechRecognizer;
+
+import java.io.File;
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -42,7 +55,6 @@ import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
 import be.swentel.solfidola.SheetMusicView.SignatureView;
-import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.Utility.Preferences;
 import be.swentel.solfidola.db.DatabaseHelper;
@@ -54,7 +66,6 @@ import jp.kshoji.javax.sound.midi.MidiUnavailableException;
 import jp.kshoji.javax.sound.midi.Receiver;
 import jp.kshoji.javax.sound.midi.ShortMessage;
 
-import static android.app.Activity.RESULT_OK;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_A;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_B;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_C;
@@ -64,25 +75,39 @@ import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_E;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_F;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_G;
 
-public class Solfege extends Fragment {
+public class Solfege extends Fragment implements RecognitionListener {
 
     private Exercise e = null;
     private int interval = 1;
     private Receiver receiver;
     private SoftSynthesizer synthesizer;
+    private Model model;
+    private SpeechRecognizer recognizer;
+    private boolean SetupListenerDone = false;
+    private boolean speechMatchIsChecking = false;
     private TextView playbackMode;
     private TextView instrument;
+    private TextView speech;
+    private TextView speechOutput;
     private TextView exercise;
     private MusicBarView bar;
+    private boolean useMic = false;
+    private ImageButton mic;
+    private LinearLayout layout;
     private TableLayout choicesContainer;
+    private List<Button> choices = new ArrayList<>();
     private ArrayList<Note> randomNotes = new ArrayList<>();
     private ArrayList<Interval> intervals = new ArrayList<>();
-    private static final int SPEECH_REQUEST_CODE = 0;
     private static final int PLAYBACK_MELODIC = 0;
     private static final int DEFAULT_PROGRAM = 0;
     private static final int DEFAULT_CHOICES = 4;
     private static final String DEFAULT_INSTRUMENT = "Standard";
     private static final String DEFAULT_SCALE = "Cmaj";
+    private static final int RECORD_AUDIO_INT = 52;
+
+    static {
+        System.loadLibrary("kaldi_jni");
+    }
 
     @Nullable
     @Override
@@ -95,6 +120,7 @@ public class Solfege extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         String title = getString(R.string.menu_solfege);
+
         // Start exercise.
         if (getArguments() != null) {
             int exerciseId = getArguments().getInt("exercise");
@@ -107,6 +133,9 @@ public class Solfege extends Fragment {
         }
         requireActivity().setTitle(title);
 
+        layout = view.findViewById(R.id.root);
+        speech = view.findViewById(R.id.speech);
+        speechOutput = view.findViewById(R.id.speechOutput);
         bar = view.findViewById(R.id.bar);
         playbackMode = view.findViewById(R.id.playbackMode);
         instrument = view.findViewById(R.id.instrument);
@@ -129,13 +158,23 @@ public class Solfege extends Fragment {
             e.printStackTrace();
         }
 
-        final ImageButton play = view.findViewById(R.id.play);
+        ImageButton play = view.findViewById(R.id.play);
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 play(randomNotes);
             }
         });
+
+        mic = view.findViewById(R.id.mic);
+        if (e != null) {
+            useMic = Preferences.getPreference(getContext(), "useMic", false);
+            mic.setOnClickListener(new onMicClickListener());
+            setMicState();
+        }
+        else {
+            mic.setVisibility(View.GONE);
+        }
 
         /*Button listen = view.findViewById(R.id.listen);
         listen.setOnClickListener(new View.OnClickListener() {
@@ -212,7 +251,7 @@ public class Solfege extends Fragment {
             numberOfChoices = e.getIntervals().size();
         }
 
-        List<Button> choices = new ArrayList<>();
+        choices = new ArrayList<>();
 
         // Solution
         int solution = 0;
@@ -489,8 +528,6 @@ public class Solfege extends Fragment {
         catch (InvalidMidiDataException e) {
             Toast.makeText(getContext(), "Down: invalid midi data: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
-
-        displaySpeechRecognizer();
     }
 
     private void setIntervals() {
@@ -513,9 +550,12 @@ public class Solfege extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+
         if (synthesizer != null) {
             synthesizer.close();
         }
+
+        stopListening();
     }
 
     @Override
@@ -642,32 +682,242 @@ public class Solfege extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void displaySpeechRecognizer() {
-        if (Preferences.getPreference(getContext(), "useSpeech", false)) {
-            Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+    // Mic listener.
+    class onMicClickListener implements View.OnClickListener {
+        @Override
+        public void onClick(View v) {
+            useMic = !useMic;
+            Preferences.setPreference(getContext(), "useMic", useMic);
+            setMicState();
+        }
+    }
+
+    /**
+     * Set the mic state.
+     */
+    private void setMicState() {
+        String usesMic = getString(R.string.no);
+        speech.setVisibility(View.VISIBLE);
+        if (useMic) {
+            if (requestPermission()) {
+                usesMic = getString(R.string.yes);
+                mic.setBackgroundResource(R.drawable.mic_on);
+                startListening();
+            }
+        }
+        else {
+            stopListening();
+            mic.setBackgroundResource(R.drawable.mic_off);
+        }
+        speech.setText(String.format(getString(R.string.speech_info), usesMic));
+    }
+
+    private void setMicStateError(String error) {
+        useMic = false;
+        Preferences.setPreference(getContext(), "useMic", useMic);
+        setMicState();
+        String message = String.format(getString(R.string.error_setup), error);
+        final Snackbar snack = Snackbar.make(layout, message, Snackbar.LENGTH_INDEFINITE);
+        snack.setAction(getString(R.string.close), new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        snack.dismiss();
+                    }
+                }
+        );
+        snack.show();
+
+    }
+
+    private void startListening() {
+        if (!SetupListenerDone) {
+            new SetupListener(this).execute();
+        }
+        else {
             try {
-                startActivityForResult(intent, SPEECH_REQUEST_CODE);
-            } catch (ActivityNotFoundException a) {
-                Toast.makeText(getActivity(),
-                        "Your device doesn't support Speech to Text",
-                        Toast.LENGTH_SHORT).show();
+                recognizer = new SpeechRecognizer(model);
+                recognizer.addListener(this);
+                recognizer.startListening();
+                setSpeechOutput(getString(R.string.listening));
+            }
+            catch (IOException e) {
+                setMicStateError(e.getMessage());
+            }
+
+        }
+    }
+
+    private static class SetupListener extends AsyncTask<Void, Void, Exception> {
+        WeakReference<Solfege> fragmentReference;
+
+        SetupListener(Solfege fragment) {
+            this.fragmentReference = new WeakReference<>(fragment);
+        }
+
+        @Override
+        protected Exception doInBackground(Void... params) {
+            try {
+                Assets assets = new Assets(fragmentReference.get().requireContext());
+                File assetDir = assets.syncAssets();
+                fragmentReference.get().model = new Model(assetDir.toString() + "/model-android");
+            }
+            catch (IOException e) {
+                return e;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Exception result) {
+            if (result != null) {
+                fragmentReference.get().setMicStateError(result.getMessage());
+            }
+            else {
+                fragmentReference.get().SetupListenerDone = true;
+                fragmentReference.get().startListening();
             }
         }
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == SPEECH_REQUEST_CODE && resultCode == RESULT_OK) {
-            List<String> results = data.getStringArrayListExtra(
-                    RecognizerIntent.EXTRA_RESULTS);
+    private void stopListening() {
+        if (recognizer != null) {
+            recognizer.cancel();
+            recognizer.shutdown();
+        }
+        speechOutput.setVisibility(View.GONE);
+    }
 
-            if (results != null) {
-                String spokenText = results.get(0);
-                Debug.debug(spokenText);
+    private void setSpeechOutput(String s) {
+        speechOutput.setVisibility(View.VISIBLE);
+        speechOutput.setText(s);
+    }
+
+    private void analyzeSpeechResult(String s, boolean exact) {
+        String match = "";
+
+        //Debug.debug("exact" + exact + " - " + s);
+
+        try {
+            JSONObject o = new JSONObject(s);
+            if (exact) {
+                if (o.has("text")) {
+                    match = o.getString("text");
+                    checkSolutionFromSpeech(match);
+                }
+            }
+        /*else {
+            if (o.has("partial")) {
+                text = o.getString("partial");
+            }
+        }*/
+        }
+        catch (JSONException e) {
+            //Debug.debug(e.getMessage());
+        }
+
+        if (match.length() > 0) {
+            String text = "";
+            //noinspection ConstantConditions
+            if (exact) {
+                text = String.format(getString(R.string.match_exact), match);
+            }
+            else {
+                text = String.format(getString(R.string.match_partial), match);
+            }
+            setSpeechOutput(text);
+        }
+    }
+
+    private void checkSolutionFromSpeech(String s) {
+        int index = -1;
+
+        if (speechMatchIsChecking) {
+            return;
+        }
+        speechMatchIsChecking = true;
+
+        switch (s) {
+            case "one":
+                index = 0;
+                break;
+            case "two":
+                index = 1;
+                break;
+            case "three":
+                index = 2;
+                break;
+            case "four":
+                index = 3;
+                break;
+            case "five":
+                index = 4;
+                break;
+            case "dix":
+                index = 5;
+                break;
+            case "seven":
+                index = 6;
+                break;
+        }
+
+        if (index != -1) {
+            try {
+                Button b = choices.get(index);
+                b.performClick();
+            }
+            catch (Exception ignored) {}
+        }
+
+        speechMatchIsChecking = false;
+    }
+
+    @Override
+    public void onPartialResult(String s) {
+        analyzeSpeechResult(s,false);
+    }
+
+    @Override
+    public void onResult(String s) {
+        analyzeSpeechResult(s,true);
+    }
+
+    @Override
+    public void onError(Exception e) {
+        String message = String.format(getString(R.string.error_listener), e.getMessage());
+        final Snackbar snack = Snackbar.make(layout, message, Snackbar.LENGTH_INDEFINITE);
+        snack.setAction(getString(R.string.close), new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    snack.dismiss();
+                }
+            }
+        );
+        snack.show();
+    }
+
+    @Override
+    public void onTimeout() {
+        Snackbar.make(layout, getString(R.string.timeout), Snackbar.LENGTH_INDEFINITE).show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == RECORD_AUDIO_INT) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                setMicState();
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private boolean requestPermission() {
+        boolean isGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
+        if (!isGranted) {
+            ActivityCompat.requestPermissions(
+                    requireActivity(),
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    RECORD_AUDIO_INT);
+        }
+        return isGranted;
     }
 
 }

@@ -63,7 +63,7 @@ public class ExerciseForm extends AppCompatActivity {
                     }
                 }
 
-                if (e.getIntervals().size() > 0) {
+                if (e.getIntervals().size() > 1) {
                     e.flattenData();
                     DatabaseHelper db = new DatabaseHelper(getApplicationContext());
                     db.saveExercise(e);
@@ -73,7 +73,7 @@ public class ExerciseForm extends AppCompatActivity {
                     finish();
                 }
                 else {
-                    Snackbar.make(root, getString(R.string.interval_empty), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(root, getString(R.string.interval_select), Snackbar.LENGTH_LONG).show();
                 }
             }
         });
