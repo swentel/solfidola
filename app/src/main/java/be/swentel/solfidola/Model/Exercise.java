@@ -35,6 +35,16 @@ public class Exercise extends Record {
     }
 
     /**
+     * Set the showBar value.
+     *
+     * @param showBar
+     *   Whether to show the bar or not.
+     */
+    public void setShowBar(boolean showBar) {
+        this.showBar = showBar;
+    }
+
+    /**
      * Prepare data.
      *
      * @param data
@@ -44,10 +54,18 @@ public class Exercise extends Record {
         this.setData(data);
         try {
             JSONObject o = new JSONObject(data);
-            JSONArray intervals = o.getJSONArray("intervals");
-            for (int i = 0; i < intervals.length(); i++) {
-                this.addInterval(intervals.getInt(i));
+
+            if (o.has("intervals")) {
+                JSONArray intervals = o.getJSONArray("intervals");
+                for (int i = 0; i < intervals.length(); i++) {
+                    this.addInterval(intervals.getInt(i));
+                }
             }
+
+            if (o.has("showBar")) {
+                this.setShowBar(o.getBoolean("showBar"));
+            }
+
         }
         catch (JSONException ignored) { }
     }
@@ -63,6 +81,7 @@ public class Exercise extends Record {
             i.put(this.getIntervals().get(j));
         }
         try {
+            o.put("showBar", this.showBar());
             o.put("intervals", i);
         }
         catch (JSONException ignored) { }

@@ -2,7 +2,6 @@ package be.swentel.solfidola;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -42,9 +41,6 @@ public class ExerciseForm extends AppCompatActivity {
             ch.setTextSize(15);
             ch.setPadding(0, 10, 0, 10);
             ch.setTextColor(getResources().getColor(R.color.textColor));
-            /*if (syndication.isChecked()) {
-                ch.setChecked(true);
-            }*/
             intervalContainer.addView(ch);
         }
 
@@ -53,6 +49,12 @@ public class ExerciseForm extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Exercise e = new Exercise();
+
+                CheckBox showBar = findViewById(R.id.showBar);
+                if (showBar.isChecked()) {
+                    e.setShowBar(true);
+                }
+
                 CheckBox checkbox;
                 for (int j = 0; j < intervals.size(); j++) {
                     checkbox = findViewById(j);
