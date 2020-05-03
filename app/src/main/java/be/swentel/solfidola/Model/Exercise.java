@@ -1,6 +1,8 @@
 package be.swentel.solfidola.Model;
 
-import android.util.Log;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -30,37 +32,28 @@ public class Exercise extends Record {
      */
     public void prepareData(String data) {
         this.setData(data);
-
-        String[] properties = data.split(";");
-        for (String p: properties) {
-            String[] keyValues = p.split(":");
-            int pos = 0;
-            for (String kv: keyValues) {
-                String[] values = kv.split(",");
-                for (String v: values) {
-                    if (pos != 0) {
-                        this.addInterval(Integer.parseInt(v));
-                        continue;
-                    }
-                    pos++;
-                }
+        try {
+            JSONObject o = new JSONObject(data);
+            JSONArray intervals = o.getJSONArray("intervals");
+            for (int i = 0; i < intervals.length(); i++) {
+                this.addInterval(intervals.getInt(i));
             }
         }
+        catch (JSONException ignored) { }
     }
 
     public void flattenData() {
-        String data = "";
+        JSONObject o = new JSONObject();
+        JSONArray i = new JSONArray();
 
-        StringBuilder i = new StringBuilder();
         for (int j = 0; j < this.getIntervals().size(); j++) {
-            i.append(this.getIntervals().get(j)).append(",");
+            i.put(this.getIntervals().get(j));
         }
-
-        if (i.length() > 0) {
-            data += "intervals:" + i + ";";
+        try {
+            o.put("intervals", i);
         }
-
-        this.setData(data);
+        catch (JSONException ignored) { }
+        this.setData(o.toString());
     }
 
 }
