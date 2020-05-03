@@ -231,6 +231,7 @@ public class Solfege extends Fragment {
         b.setTag(intervals.get(solution).getInterval());
         b.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         b.setTextColor(getResources().getColor(R.color.buttonDarkText));
+        b.setPadding(30, 0, 30, 0);
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -258,6 +259,7 @@ public class Solfege extends Fragment {
             b.setText(intervals.get(randomIndex).getLabel());
             b.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
             b.setTextColor(getResources().getColor(R.color.buttonDarkText));
+            b.setPadding(30, 0, 30, 0);
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
