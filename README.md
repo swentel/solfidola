@@ -18,7 +18,7 @@ Features:
 
 ## Screenshot
 
-<img src="https://realize.be/sites/default/files/solfidola-solfege.png" width="400" />
+<img src="https://realize.be/sites/default/files/solfidola-solfege.png?cache=1" width="400" />
 
 ## Credits
 
