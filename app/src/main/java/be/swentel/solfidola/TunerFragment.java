@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -107,8 +106,7 @@ public class TunerFragment extends Fragment {
     private boolean requestPermission() {
         boolean isGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
         if (!isGranted) {
-            ActivityCompat.requestPermissions(
-                    requireActivity(),
+            requestPermissions(
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     RECORD_AUDIO_INT);
         }

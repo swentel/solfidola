@@ -1,5 +1,4 @@
 *.iml
-to-do
 documentatie
 .gradle
 /local.properties
@@ -15,3 +14,5 @@ documentatie
 .externalNativeBuild
 .cxx
 app/release
+*.md5
+*.lst

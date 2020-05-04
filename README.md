@@ -1,13 +1,13 @@
 # Solfidola
 
-Solfège learning.
+Solfège and more!
 
 Features:
 
 - Random interval training
 - Create exercises with selected intervals
 - Use voice commands in exercises
-  - replay: plays the interval again
+  - play/replay: plays the interval again
   - say the number that matches the interval choice position;
     e.g. you selected 3 intervals. As the order of choices
     will be from low to high, and for instance the solution is

@@ -25,6 +25,7 @@
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
     <string name="mic">Microphone</string>
+    <string name="setup">Setting up microphone …</string>
     <string name="error_listener">Error listener: %s</string>
     <string name="error_setup">Error setup: %s</string>
     <string name="timeout">Timeout on speech</string>

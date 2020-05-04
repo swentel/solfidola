@@ -23,7 +23,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -701,8 +700,9 @@ public class Solfege extends Fragment implements RecognitionListener {
         if (useMic) {
             if (requestPermission()) {
                 usesMic = getString(R.string.yes);
+                setSpeechOutput(getString(R.string.setup));
                 mic.setBackgroundResource(R.drawable.mic_on);
-                startListening();
+                startListening(false);
             }
         }
         else {
@@ -729,7 +729,12 @@ public class Solfege extends Fragment implements RecognitionListener {
 
     }
 
-    private void startListening() {
+    private void startListening(boolean setupDone) {
+
+        if (setupDone) {
+            SetupListenerDone = true;
+        }
+
         if (!SetupListenerDone) {
             new SetupListener(this).execute();
         }
@@ -773,8 +778,7 @@ public class Solfege extends Fragment implements RecognitionListener {
                 fragmentReference.get().setMicStateError(result.getMessage());
             }
             else {
-                fragmentReference.get().SetupListenerDone = true;
-                fragmentReference.get().startListening();
+                fragmentReference.get().startListening(true);
             }
         }
     }
@@ -816,7 +820,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
 
         if (match.length() > 0) {
-            String text = "";
+            String text;
             //noinspection ConstantConditions
             if (exact) {
                 text = String.format(getString(R.string.match_exact), match);
@@ -841,22 +845,40 @@ public class Solfege extends Fragment implements RecognitionListener {
                 index = 0;
                 break;
             case "two":
+            case "to":
                 index = 1;
                 break;
+            case "tree":
             case "three":
                 index = 2;
                 break;
             case "four":
+            case "fore":
                 index = 3;
                 break;
             case "five":
                 index = 4;
                 break;
-            case "dix":
+            case "six":
                 index = 5;
                 break;
             case "seven":
                 index = 6;
+                break;
+            case "eight":
+                index = 7;
+                break;
+            case "nine":
+                index = 8;
+                break;
+            case "ten":
+                index = 9;
+                break;
+            case "eleven":
+                index = 10;
+                break;
+            case "twelve":
+                index = 11;
                 break;
         }
 
@@ -868,7 +890,7 @@ public class Solfege extends Fragment implements RecognitionListener {
             catch (Exception ignored) {}
         }
 
-        if (s.equals("play")) {
+        if (s.equals("play") || s.equals("replay")) {
             play(randomNotes);
         }
 
@@ -916,8 +938,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     private boolean requestPermission() {
         boolean isGranted = ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED;
         if (!isGranted) {
-            ActivityCompat.requestPermissions(
-                    requireActivity(),
+            requestPermissions(
                     new String[]{Manifest.permission.RECORD_AUDIO},
                     RECORD_AUDIO_INT);
         }
