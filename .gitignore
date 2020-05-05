@@ -9,6 +9,7 @@ documentatie
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
+/models/build
 /build
 /captures
 .externalNativeBuild

@@ -58,7 +58,6 @@ import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
 import be.swentel.solfidola.SheetMusicView.SignatureView;
-import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.Utility.Preferences;
 import be.swentel.solfidola.db.DatabaseHelper;
