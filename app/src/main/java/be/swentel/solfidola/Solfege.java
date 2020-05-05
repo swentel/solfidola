@@ -38,10 +38,12 @@ import org.kaldi.SpeechRecognizer;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -93,6 +95,8 @@ public class Solfege extends Fragment implements RecognitionListener {
     private boolean useMic = false;
     private ImageButton mic;
     private LinearLayout layout;
+    private int startTime = 0;
+    private boolean hasClicked = false;
     private TableLayout choicesContainer;
     private List<Button> choices = new ArrayList<>();
     private ArrayList<Note> randomNotes = new ArrayList<>();
@@ -161,6 +165,10 @@ public class Solfege extends Fragment implements RecognitionListener {
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (e != null) {
+                    e.setReplays(e.getReplays() + 1);
+                    saveExercise();
+                }
                 play(randomNotes);
             }
         });
@@ -212,6 +220,12 @@ public class Solfege extends Fragment implements RecognitionListener {
             bar.removeAllViews();
         }
 
+        hasClicked = false;
+        if (e != null) {
+            e.setAttempts(e.getAttempts() + 1);
+            saveExercise();
+        }
+
         setPlaybackMode();
         setIntervals();
         drawClef();
@@ -223,6 +237,12 @@ public class Solfege extends Fragment implements RecognitionListener {
     private void doRenew() {
         setup(true);
         playNotes();
+    }
+
+    private void saveExercise() {
+        e.flattenData();
+        DatabaseHelper db = new DatabaseHelper(getContext());
+        db.saveExercise(e);
     }
 
     private void setPlaybackMode() {
@@ -280,7 +300,7 @@ public class Solfege extends Fragment implements RecognitionListener {
                         public void run() {
                             doRenew();
                         }
-                    }, Preferences.getPreference(getContext(), "autoRefreshDelay", 2) * 1000);
+                    }, Preferences.getPreference(getContext(), "autoRefreshDelay", 2) * 250);
                 }
             }
         });
@@ -301,6 +321,11 @@ public class Solfege extends Fragment implements RecognitionListener {
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    if (e != null) {
+                        hasClicked = true;
+                        e.setMistakes(e.getMistakes() + 1);
+                        saveExercise();
+                    }
                     v.setBackgroundColor(getResources().getColor(R.color.wrong));
                 }
             });
@@ -479,6 +504,10 @@ public class Solfege extends Fragment implements RecognitionListener {
         long TIMESTAMP = -1;
         boolean melodic = Preferences.getPreference(getContext(), "playback", PLAYBACK_MELODIC) == PLAYBACK_MELODIC;
 
+        if (startTime == 0) {
+            startTime = (int) System.currentTimeMillis()/1000;
+        }
+
         try {
 
             int channel = 0;
@@ -552,6 +581,18 @@ public class Solfege extends Fragment implements RecognitionListener {
 
         if (synthesizer != null) {
             synthesizer.close();
+        }
+
+        if (e != null) {
+
+            if (!hasClicked) {
+                e.setAttempts(e.getAttempts() - 1);
+            }
+
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            e.setTimestamp(format.format(new Date()));
+            e.setTimer(e.getTimer() + ((int) System.currentTimeMillis()/1000 - startTime));
+            saveExercise();
         }
 
         stopListening();
@@ -891,6 +932,10 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
 
         if (s.equals("play") || s.equals("replay")) {
+            if (e != null) {
+                e.setReplays(e.getReplays() + 1);
+                saveExercise();
+            }
             play(randomNotes);
         }
 

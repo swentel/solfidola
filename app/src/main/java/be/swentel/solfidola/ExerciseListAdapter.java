@@ -60,6 +60,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
         int position;
         TextView label;
         TextView date;
+        TextView stats;
         Button play;
         Button delete;
         LinearLayout row;
@@ -73,6 +74,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             holder = new ViewHolder();
             holder.row = convertView.findViewById(R.id.list_item_row);
             holder.label = convertView.findViewById(R.id.list_label);
+            holder.stats = convertView.findViewById(R.id.list_stats);
             holder.date = convertView.findViewById(R.id.list_date);
             holder.play = convertView.findViewById(R.id.play);
             holder.delete = convertView.findViewById(R.id.delete);
@@ -98,6 +100,11 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
                 text.add(i.getLabel());
             }
             holder.label.setText(String.format(context.getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
+
+            // Stats.
+            int success = exercise.getAttempts() - exercise.getMistakes();
+            String stats = String.format(context.getString(R.string.stats), success, exercise.getAttempts(), exercise.getReplays(), exercise.getTimer());
+            holder.stats.setText(stats);
 
             // Published
             @SuppressLint("SimpleDateFormat")

@@ -61,6 +61,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_DATA, record.getData());
 
         if (record.getId() > 0) {
+            values.put(COLUMN_TIMESTAMP, record.getTimestamp());
             db.update(TABLE_DATA_NAME, values, COLUMN_ID + "=" + record.getId(), null);
         }
         else {

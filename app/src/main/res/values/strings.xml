@@ -35,6 +35,7 @@
     <string name="exercise_deleted">Exercise deleted</string>
     <string name="exercise_new">New exercise</string>
     <string name="start">Start</string>
+    <string name="stats">Score: %d/%d - Replays: %d - Time: %d seconds</string>
     <string name="interval_select">Select at least two intervals</string>
     <string name="exercise_created">Exercise created</string>
     <string name="exercise">Exercise: %s</string>

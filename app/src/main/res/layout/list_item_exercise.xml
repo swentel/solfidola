@@ -21,6 +21,14 @@
         android:textSize="@dimen/list_item_text_size"
         android:layout_width="fill_parent" />
 
+    <TextView
+        android:id="@+id/list_stats"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:textColor="@color/textColor"
+        android:textSize="@dimen/list_item_text_size"
+        android:layout_width="fill_parent" />
+
     <RelativeLayout
         android:paddingTop="10dp"
         android:layout_width="fill_parent"
