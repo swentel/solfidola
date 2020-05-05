@@ -58,7 +58,7 @@
 
         <ImageButton
             android:id="@+id/play"
-            android:background="@drawable/play"
+            android:background="@drawable/button_play_idle"
             android:layout_width="@dimen/actionButtonSize"
             android:layout_height="@dimen/actionButtonSize"
             android:contentDescription="@string/play" />

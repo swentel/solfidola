@@ -1,8 +1,10 @@
 package be.swentel.solfidola;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -56,6 +58,7 @@ import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
 import be.swentel.solfidola.SheetMusicView.SignatureView;
+import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.Utility.Preferences;
 import be.swentel.solfidola.db.DatabaseHelper;
@@ -144,6 +147,14 @@ public class Solfege extends Fragment implements RecognitionListener {
         instrument = view.findViewById(R.id.instrument);
         choicesContainer = view.findViewById(R.id.choicesContainer);
         setHasOptionsMenu(true);
+
+        AudioManager audioManager = (AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE);
+        if (audioManager != null) {
+            int volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+            if (volumeLevel == 0) {
+                Snackbar.make(layout, getString(R.string.volume_off), Snackbar.LENGTH_LONG).show();
+            }
+        }
 
         try {
             SF2Soundbank sf = new SF2Soundbank(requireActivity().getAssets().open("Solfidola.sf2"));

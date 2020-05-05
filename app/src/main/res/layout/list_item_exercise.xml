@@ -36,7 +36,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:background="@drawable/play"
+            android:background="@drawable/button_play"
             android:id="@+id/play"
             android:hint="@string/play"
             android:textColorHint="@android:color/transparent"

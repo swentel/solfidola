@@ -30,6 +30,7 @@
     <string name="error_setup">Error setup: %s</string>
     <string name="timeout">Timeout on speech</string>
 
+    <string name="volume_off">Your volume is turned off</string>
     <string name="no_exercises">No exercises, create your first!</string>
     <string name="exercise_delete_confirm">Are you sure you want to delete this exercise?</string>
     <string name="exercise_deleted">Exercise deleted</string>
