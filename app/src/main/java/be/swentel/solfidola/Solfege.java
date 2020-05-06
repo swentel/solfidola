@@ -94,6 +94,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     private TextView speechOutput;
     private TextView exercise;
     private MusicBarView bar;
+    private boolean volumeOn = true;
     private boolean useMic = false;
     private ImageButton mic;
     private LinearLayout layout;
@@ -147,13 +148,17 @@ public class Solfege extends Fragment implements RecognitionListener {
         choicesContainer = view.findViewById(R.id.choicesContainer);
         setHasOptionsMenu(true);
 
-        AudioManager audioManager = (AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE);
-        if (audioManager != null) {
-            int volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-            if (volumeLevel == 0) {
-                Snackbar.make(layout, getString(R.string.volume_off), Snackbar.LENGTH_LONG).show();
+        try {
+            AudioManager audioManager = (AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE);
+            if (audioManager != null) {
+                int volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                if (volumeLevel == 0) {
+                    volumeOn = false;
+                    Snackbar.make(layout, getString(R.string.volume_off), Snackbar.LENGTH_LONG).show();
+                }
             }
         }
+        catch (Exception ignored) {}
 
         try {
             SF2Soundbank sf = new SF2Soundbank(requireActivity().getAssets().open("Solfidola.sf2"));
@@ -175,10 +180,11 @@ public class Solfege extends Fragment implements RecognitionListener {
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (e != null) {
+                if (e != null && volumeOn) {
                     e.setReplays(e.getReplays() + 1);
                     saveExercise();
                 }
+                volumeOn = true;
                 play(randomNotes);
             }
         });
@@ -942,10 +948,11 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
 
         if (s.equals("play") || s.equals("replay")) {
-            if (e != null) {
+            if (e != null && volumeOn) {
                 e.setReplays(e.getReplays() + 1);
                 saveExercise();
             }
+            volumeOn = true;
             play(randomNotes);
         }
 
