@@ -1,11 +1,14 @@
 package be.swentel.solfidola;
 
 import android.Manifest;
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
+import android.media.SoundPool;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.LayoutInflater;
@@ -69,6 +72,7 @@ import jp.kshoji.javax.sound.midi.MidiUnavailableException;
 import jp.kshoji.javax.sound.midi.Receiver;
 import jp.kshoji.javax.sound.midi.ShortMessage;
 
+import static android.content.Context.AUDIO_SERVICE;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_A;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_B;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_C;
@@ -101,6 +105,13 @@ public class Solfege extends Fragment implements RecognitionListener {
     private int startTime = 0;
     private boolean hasClicked = false;
     private TableLayout choicesContainer;
+    private SoundPool soundPool;
+    private boolean soundPoolLoaded = false;
+    private int soundIdSuccess;
+    private int soundIdWrong;
+    private float volume;
+    private static final int streamType = AudioManager.STREAM_MUSIC;
+    private static final int MAX_STREAMS = 2;
     private List<Button> choices = new ArrayList<>();
     private ArrayList<Note> randomNotes = new ArrayList<>();
     private ArrayList<Interval> intervals = new ArrayList<>();
@@ -149,7 +160,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         setHasOptionsMenu(true);
 
         try {
-            AudioManager audioManager = (AudioManager) requireActivity().getSystemService(Context.AUDIO_SERVICE);
+            AudioManager audioManager = (AudioManager) requireActivity().getSystemService(AUDIO_SERVICE);
             if (audioManager != null) {
                 int volumeLevel = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                 if (volumeLevel == 0) {
@@ -309,6 +320,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                feedBack(true);
                 v.setBackgroundColor(getResources().getColor(R.color.right));
                 if (Preferences.getPreference(getContext(), "autoRefresh", true)) {
                     new Handler().postDelayed(new Runnable() {
@@ -342,6 +354,7 @@ public class Solfege extends Fragment implements RecognitionListener {
                         e.setMistakes(e.getMistakes() + 1);
                         saveExercise();
                     }
+                    feedBack(false);
                     v.setBackgroundColor(getResources().getColor(R.color.wrong));
                 }
             });
@@ -605,6 +618,7 @@ public class Solfege extends Fragment implements RecognitionListener {
                 e.setAttempts(e.getAttempts() - 1);
             }
 
+            @SuppressLint("SimpleDateFormat")
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             e.setTimestamp(format.format(new Date()));
             e.setTimer(e.getTimer() + ((int) System.currentTimeMillis()/1000 - startTime));
@@ -612,6 +626,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
 
         stopListening();
+        stopSoundPool();
     }
 
     @Override
@@ -748,6 +763,60 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
     }
 
+    private void stopSoundPool() {
+        if (soundPoolLoaded) {
+            soundPool.release();
+        }
+    }
+
+    private void setupSoundPool() {
+
+        AudioManager audioManager = (AudioManager) requireActivity().getSystemService(AUDIO_SERVICE);
+
+        // Current volume Index of particular stream type.
+        float currentVolumeIndex = audioManager.getStreamVolume(streamType);
+
+        // Get the maximum volume index for a particular stream type.
+        float maxVolumeIndex  = audioManager.getStreamMaxVolume(streamType);
+
+        // Volume (0 --> 1)
+        volume = currentVolumeIndex / maxVolumeIndex;
+
+        // Suggests an audio stream whose volume should be changed by
+        // the hardware volume controls.
+        requireActivity().setVolumeControlStream(streamType);
+
+        // For Android SDK >= 21
+        if (Build.VERSION.SDK_INT >= 21 ) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_GAME)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .build();
+
+            SoundPool.Builder builder= new SoundPool.Builder();
+            builder.setAudioAttributes(audioAttributes).setMaxStreams(MAX_STREAMS);
+
+            soundPool = builder.build();
+        }
+        // for Android SDK < 21
+        else {
+            // SoundPool(int maxStreams, int streamType, int srcQuality)
+            //noinspection deprecation
+            soundPool = new SoundPool(MAX_STREAMS, AudioManager.STREAM_MUSIC, 0);
+        }
+
+        // When Sound Pool load complete.
+        soundPool.setOnLoadCompleteListener(new SoundPool.OnLoadCompleteListener() {
+            @Override
+            public void onLoadComplete(SoundPool soundPool, int sampleId, int status) {
+                soundPoolLoaded = true;
+            }
+        });
+
+        soundIdSuccess = this.soundPool.load(getContext(), R.raw.success,1);
+        soundIdWrong = this.soundPool.load(getContext(), R.raw.wrong,1);
+    }
+
     /**
      * Set the mic state.
      */
@@ -757,12 +826,14 @@ public class Solfege extends Fragment implements RecognitionListener {
         if (useMic) {
             if (requestPermission()) {
                 usesMic = getString(R.string.yes);
+                setupSoundPool();
                 setSpeechOutput(getString(R.string.setup));
                 mic.setBackgroundResource(R.drawable.mic_on);
                 startListening(false);
             }
         }
         else {
+            stopSoundPool();
             stopListening();
             mic.setBackgroundResource(R.drawable.mic_off);
         }
@@ -1006,5 +1077,17 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
         return isGranted;
     }
+
+    private void feedBack(boolean correctResponse) {
+        if (useMic && soundPoolLoaded) {
+            if (correctResponse) {
+                soundPool.play(soundIdSuccess,volume, volume, 1, 0, 1f);
+            }
+            else {
+                soundPool.play(soundIdWrong,volume, volume, 1, 0, 1f);
+            }
+        }
+    }
+
 
 }

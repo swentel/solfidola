@@ -13,6 +13,7 @@ Features:
     will be from low to high, and for instance the solution is
     the second, say 'two'. You will get feedback if you're right
     or not.
+- Sound feedback when using the microphone
 - Auto plays the interval and refreshes when the right solution is selected
 - Tuner: still in experimental state (sing note C)
 
