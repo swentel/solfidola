@@ -61,6 +61,7 @@ import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
 import be.swentel.solfidola.SheetMusicView.SignatureView;
+import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.Utility.Preferences;
 import be.swentel.solfidola.db.DatabaseHelper;
@@ -961,7 +962,9 @@ public class Solfege extends Fragment implements RecognitionListener {
     }
 
     private void checkSolutionFromSpeech(String s) {
-        int index = -1;
+        int speechInterval = -1;
+
+        Debug.debug("Match: " + s);
 
         if (speechMatchIsChecking) {
             return;
@@ -969,51 +972,71 @@ public class Solfege extends Fragment implements RecognitionListener {
         speechMatchIsChecking = true;
 
         switch (s) {
-            case "one":
-                index = 0;
+            case "unison":
+                speechInterval = 0;
                 break;
-            case "two":
-            case "to":
-                index = 1;
+            case "minor second":
+                speechInterval = 1;
                 break;
-            case "tree":
-            case "three":
-                index = 2;
+            case "major second":
+                speechInterval = 2;
                 break;
-            case "four":
-            case "fore":
-                index = 3;
+            case "minor third":
+            case "augmented second":
+                speechInterval = 3;
                 break;
-            case "five":
-                index = 4;
+            case "major third":
+                speechInterval = 4;
                 break;
-            case "six":
-                index = 5;
+            case "perfect fourth":
+                speechInterval = 5;
                 break;
-            case "seven":
-                index = 6;
+            case "diminished fifth":
+            case "augmented fourth":
+                speechInterval = 6;
                 break;
-            case "eight":
-                index = 7;
+            case "perfect fifth":
+                speechInterval = 7;
                 break;
-            case "nine":
-                index = 8;
+            case "minor six":
+            case "minor sixth":
+            case "augmented fifth":
+                speechInterval = 8;
                 break;
-            case "ten":
-                index = 9;
+            case "major six":
+            case "major sixth":
+            case "diminished seventh":
+                speechInterval = 9;
                 break;
-            case "eleven":
-                index = 10;
+            case "minor seven":
+            case "minor seventh":
+                speechInterval = 10;
                 break;
-            case "twelve":
-                index = 11;
+            case "major seven":
+            case "major seventh":
+                speechInterval = 11;
+                break;
+            case "octave":
+                speechInterval = 12;
                 break;
         }
 
-        if (index != -1) {
+        if (speechInterval != -1) {
             try {
-                Button b = choices.get(index);
-                b.performClick();
+                boolean foundButton = false;
+
+                for (Button b: choices) {
+                    Integer buttonInterval = (Integer) b.getTag();
+                    if (buttonInterval.equals(speechInterval)) {
+                        foundButton = true;
+                        b.performClick();
+                        break;
+                    }
+                }
+
+                if (!foundButton) {
+                    feedBack(false);
+                }
             }
             catch (Exception ignored) {}
         }

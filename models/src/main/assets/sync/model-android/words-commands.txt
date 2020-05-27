@@ -21,3 +21,15 @@ next
 again
 micro
 mic
+minor
+major
+second
+third
+fourth
+fifth
+sixth
+seventh
+octave
+perfect
+diminished
+augmented
