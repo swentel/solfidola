@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -158,6 +159,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         instrument = view.findViewById(R.id.instrument);
         choicesContainer = view.findViewById(R.id.choicesContainer);
         setHasOptionsMenu(true);
+        setDisplay();
 
         try {
             AudioManager audioManager = (AudioManager) requireActivity().getSystemService(AUDIO_SERVICE);
@@ -259,6 +261,15 @@ public class Solfege extends Fragment implements RecognitionListener {
         drawSignature();
         drawNotes();
         drawChoices();
+    }
+
+    private void setDisplay() {
+        if (Preferences.getPreference(getContext(), "display_on", false)) {
+            requireActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+        else {
+            requireActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     private void doRenew() {
@@ -665,10 +676,33 @@ public class Solfege extends Fragment implements RecognitionListener {
                 mDialog = mBuilder.create();
                 mDialog.show();
                 return true;
+            case R.id.display:
+                mBuilder.setTitle(R.string.display);
+                boolean[] checked = new boolean[] {Preferences.getPreference(getContext(), "display_on", false)};
+                mBuilder.setMultiChoiceItems(new String[]{getString(R.string.display_on)}, checked, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                        Preferences.setPreference(getContext(), "display_on", b);
+                        dialogInterface.dismiss();
+                        setDisplay();
+
+                        String message;
+                        if (b) {
+                            message = getContext().getString(R.string.display_stay_on);
+                        }
+                        else {
+                            message = getContext().getString(R.string.display_stay_off);
+                        }
+                        Snackbar.make(layout, message, Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+                mDialog = mBuilder.create();
+                mDialog.show();
+                return true;
             case R.id.sheetMusic:
                 mBuilder.setTitle(R.string.bar);
-                boolean[] checked = new boolean[] {Preferences.getPreference(getContext(), "show_bar", true)};
-                mBuilder.setMultiChoiceItems(new String[]{getString(R.string.show_bar)}, checked, new DialogInterface.OnMultiChoiceClickListener() {
+                boolean[] displayOn = new boolean[] {Preferences.getPreference(getContext(), "show_bar", true)};
+                mBuilder.setMultiChoiceItems(new String[]{getString(R.string.show_bar)}, displayOn, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, boolean b) {
                         Preferences.setPreference(getContext(), "show_bar", b);

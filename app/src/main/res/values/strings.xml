@@ -48,6 +48,10 @@
     <string name="match_partial">Partial match: %s</string>
     <string name="listening">Listening …</string>
 
+    <string name="display">Display</string>
+    <string name="display_on">Keep display on</string>
+    <string name="display_stay_on">Display will stay on</string>
+    <string name="display_stay_off">Display will go to sleep after a while</string>
     <string name="number_of_choices">Number of choices</string>
     <string name="play">Play</string>
     <string name="renew">Renew</string>
