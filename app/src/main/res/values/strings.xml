@@ -19,6 +19,8 @@
     <string name="harmonic">Harmonic</string>
     <string name="bar">Music bar</string>
     <string name="show_bar">Show music bar</string>
+    <string name="random_interval_form">Add random interval</string>
+    <string name="random_interval">Random interval</string>
     <string name="instrument_selected">Instrument: %s</string>
     <string name="playback_mode">Playback mode: %s</string>
     <string name="instrument">Instrument</string>

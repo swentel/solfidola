@@ -15,6 +15,7 @@ public class Exercise extends Record {
     private int timer = 0;
     private int replays = 0;
     private boolean showBar = false;
+    private boolean randomInterval = false;
     private ArrayList<Integer> intervals = new ArrayList<>();
 
     public Exercise() {
@@ -61,31 +62,22 @@ public class Exercise extends Record {
         this.mistakes = mistakes;
     }
 
-    /**
-     * Whether to show the bar or not.
-     *
-     * @return boolean
-     */
+    public boolean addRandomInterval() {
+        return randomInterval;
+    }
+
+    public void setRandomInterval(boolean randomInterval) {
+        this.randomInterval = randomInterval;
+    }
+
     public boolean showBar() {
         return showBar;
     }
 
-    /**
-     * Set the showBar value.
-     *
-     * @param showBar
-     *   Whether to show the bar or not.
-     */
     public void setShowBar(boolean showBar) {
         this.showBar = showBar;
     }
 
-    /**
-     * Prepare data.
-     *
-     * @param data
-     *   The data from the storage.
-     */
     public void prepareData(String data) {
         this.setData(data);
         try {
@@ -100,6 +92,10 @@ public class Exercise extends Record {
 
             if (o.has("showBar")) {
                 this.setShowBar(o.getBoolean("showBar"));
+            }
+
+            if (o.has("randomInterval")) {
+                this.setRandomInterval(o.getBoolean("randomInterval"));
             }
 
             if (o.has("attempts")) {
@@ -133,6 +129,7 @@ public class Exercise extends Record {
         }
         try {
             o.put("showBar", this.showBar());
+            o.put("randomInterval", this.addRandomInterval());
             o.put("intervals", i);
             o.put("timer", this.getTimer());
             o.put("replays", this.getReplays());

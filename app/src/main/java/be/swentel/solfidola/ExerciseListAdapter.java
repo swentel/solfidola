@@ -94,10 +94,13 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             holder.row.setBackgroundColor(color);
 
             // Label
-            ArrayList<Interval> intervals = Intervals.list(exercise.getIntervals());
+            ArrayList<Interval> intervals = Intervals.list(exercise.getIntervals(), false);
             ArrayList<String> text = new ArrayList<>();
             for (Interval i : intervals) {
                 text.add(i.getLabel());
+            }
+            if (exercise.addRandomInterval()) {
+                text.add(context.getString(R.string.random_interval));
             }
             holder.label.setText(String.format(context.getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
 

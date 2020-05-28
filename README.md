@@ -6,6 +6,8 @@ Features:
 
 - Random interval training
 - Create exercises with selected intervals
+  - show bar or not
+  - add random non selected interval
 - Use voice commands in exercises
   - play/replay: plays the interval again
   - speak the interval for the right solution (in English):

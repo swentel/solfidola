@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="10dp"
+<ScrollView
     android:id="@+id/root"
-    android:orientation="vertical"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <CheckBox
-        android:layout_marginBottom="20dp"
-        android:text="@string/show_bar"
-        android:id="@+id/showBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
 
-    <LinearLayout android:orientation="vertical"
-        android:id="@+id/intervalContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <CheckBox
+            android:layout_marginBottom="20dp"
+            android:text="@string/show_bar"
+            android:id="@+id/showBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/start"
-        android:text="@string/start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        <CheckBox
+            android:layout_marginBottom="20dp"
+            android:text="@string/random_interval_form"
+            android:id="@+id/addRandomInterval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-</LinearLayout>
+        <LinearLayout android:orientation="vertical"
+            android:id="@+id/intervalContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/start"
+            android:text="@string/start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+</ScrollView>

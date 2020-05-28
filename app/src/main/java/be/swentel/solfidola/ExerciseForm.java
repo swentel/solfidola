@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,7 +22,7 @@ import be.swentel.solfidola.db.DatabaseHelper;
 
 public class ExerciseForm extends AppCompatActivity {
 
-    LinearLayout root;
+    ScrollView root;
     LinearLayout intervalContainer;
     private ArrayList<Interval> intervals = new ArrayList<>();
 
@@ -53,6 +54,11 @@ public class ExerciseForm extends AppCompatActivity {
                 CheckBox showBar = findViewById(R.id.showBar);
                 if (showBar.isChecked()) {
                     e.setShowBar(true);
+                }
+
+                CheckBox randomInterval = findViewById(R.id.addRandomInterval);
+                if (randomInterval.isChecked()) {
+                    e.setRandomInterval(true);
                 }
 
                 CheckBox checkbox;

@@ -296,6 +296,9 @@ public class Solfege extends Fragment implements RecognitionListener {
         // Limit choices to the number of intervals in the exercise.
         if (e != null) {
             numberOfChoices = e.getIntervals().size();
+            if (e.addRandomInterval()) {
+                numberOfChoices++;
+            }
         }
 
         choices = new ArrayList<>();
@@ -388,7 +391,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
         for (Button choice: choices) {
 
-            if ((numberOfButtons % 3) == 0) {
+            if ((numberOfButtons % 2) == 0) {
                 row = new TableRow(getContext());
                 row.setPadding(0, 0, 0, 40);
                 choicesContainer.addView(row);
@@ -592,11 +595,16 @@ public class Solfege extends Fragment implements RecognitionListener {
         intervals.clear();
 
         if (e != null) {
-            intervals = Intervals.list(e.getIntervals());
+            intervals = Intervals.list(e.getIntervals(), e.addRandomInterval());
             exercise.setVisibility(View.VISIBLE);
             ArrayList<String> text = new ArrayList<>();
             for (Interval i : intervals) {
-                text.add(i.getLabel());
+                if (e.getIntervals().contains(i.getInterval())) {
+                    text.add(i.getLabel());
+                }
+            }
+            if (e.addRandomInterval()) {
+                text.add(getString(R.string.random_interval));
             }
             exercise.setText(String.format(getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
         }
