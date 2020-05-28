@@ -12,7 +12,7 @@ Features:
   - play/replay: plays the interval again
   - speak the interval for the right solution (in English):
     minor second, major second, minor third (augmented second), major third, perfect fourth
-    diminished fifth (augmented fourth), perfect fifth, minor sixth (augmented fifth),
+    diminished fifth (augmented fourth, tritone), perfect fifth, minor sixth (augmented fifth),
     major sixth (diminished seventh), minor seventh, major seventh, octave
 
 - Sound feedback when using the microphone

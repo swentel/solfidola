@@ -15,7 +15,7 @@ public class Intervals {
         intervals.add(new Interval(3, "Minor third"));
         intervals.add(new Interval(4, "Major third"));
         intervals.add(new Interval(5, "Perfect fourth"));
-        intervals.add(new Interval(6, "Diminished fifth"));
+        intervals.add(new Interval(6, "Tritone"));
         intervals.add(new Interval(7, "Perfect fifth"));
         intervals.add(new Interval(8, "Minor sixth"));
         intervals.add(new Interval(9, "Major sixth"));

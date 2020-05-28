@@ -998,6 +998,8 @@ public class Solfege extends Fragment implements RecognitionListener {
             case "perfect fourth":
                 speechInterval = 5;
                 break;
+            case "tritone":
+            case "try tone":
             case "diminished fifth":
             case "augmented fourth":
                 speechInterval = 6;
