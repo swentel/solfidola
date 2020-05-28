@@ -23,6 +23,13 @@ Features:
 
 <img src="https://realize.be/sites/default/files/solfidola-solfege.png?cache=1" width="400" />
 
+## Development
+
+To add new commands to be recognized, add new words to words-commands.txt and these commands:
+
+- fstsymbols --save_osymbols=words.txt Gr.fst > /dev/null
+- farcompilestrings --fst_type=compact --symbols=words.txt --keep_symbols words-commands.txt | ngramcount | ngrammake | fstconvert --fst_type=ngram > Gr.fst
+
 ## Credits
 
 This app uses following external libraries:

@@ -61,7 +61,6 @@ import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
 import be.swentel.solfidola.SheetMusicView.SignatureView;
-import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.Utility.Preferences;
 import be.swentel.solfidola.db.DatabaseHelper;
@@ -972,7 +971,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     private void checkSolutionFromSpeech(String s) {
         int speechInterval = -1;
 
-        Debug.debug("Match: " + s);
+        //Debug.debug("Match: " + s);
 
         if (speechMatchIsChecking) {
             return;

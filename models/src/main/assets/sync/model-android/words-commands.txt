@@ -21,6 +21,8 @@ next
 again
 micro
 mic
+pause
+unison
 minor
 major
 second
