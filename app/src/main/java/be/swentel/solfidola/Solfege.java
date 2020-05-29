@@ -688,10 +688,10 @@ public class Solfege extends Fragment implements RecognitionListener {
 
                         String message;
                         if (b) {
-                            message = getContext().getString(R.string.display_stay_on);
+                            message = requireContext().getString(R.string.display_stay_on);
                         }
                         else {
-                            message = getContext().getString(R.string.display_stay_off);
+                            message = requireContext().getString(R.string.display_stay_off);
                         }
                         Snackbar.make(layout, message, Snackbar.LENGTH_SHORT).show();
                     }
