@@ -58,7 +58,8 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
 
     public static class ViewHolder {
         int position;
-        TextView label;
+        TextView intervals;
+        TextView intervalType;
         TextView date;
         TextView stats;
         Button play;
@@ -73,7 +74,8 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             convertView = mInflater.inflate(R.layout.list_item_exercise, null);
             holder = new ViewHolder();
             holder.row = convertView.findViewById(R.id.list_item_row);
-            holder.label = convertView.findViewById(R.id.list_label);
+            holder.intervals = convertView.findViewById(R.id.list_intervals);
+            holder.intervalType = convertView.findViewById(R.id.list_interval_type);
             holder.stats = convertView.findViewById(R.id.list_stats);
             holder.date = convertView.findViewById(R.id.list_date);
             holder.play = convertView.findViewById(R.id.play);
@@ -93,7 +95,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             int color = context.getResources().getColor(R.color.listRowBackgroundColor);
             holder.row.setBackgroundColor(color);
 
-            // Label
+            // Intervals
             ArrayList<Interval> intervals = Intervals.list(exercise.getIntervals(), false);
             ArrayList<String> text = new ArrayList<>();
             for (Interval i : intervals) {
@@ -102,7 +104,23 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             if (exercise.addRandomInterval()) {
                 text.add(context.getString(R.string.random_interval));
             }
-            holder.label.setText(String.format(context.getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
+            holder.intervals.setText(String.format(context.getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
+
+            // Interval type.
+            String interval;
+            switch (exercise.getIntervalType()) {
+                case 2:
+                    interval = context.getString(R.string.random);
+                    break;
+                case 1:
+                    interval = context.getString(R.string.desc);
+                    break;
+                case 0:
+                default:
+                    interval = context.getString(R.string.asc);
+                    break;
+            }
+            holder.intervalType.setText(String.format(context.getString(R.string.interval_type), interval));
 
             // Stats.
             int success = exercise.getAttempts() - exercise.getMistakes();

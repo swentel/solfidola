@@ -17,6 +17,7 @@ twelve
 triton
 try
 tone
+prime
 play
 replay
 stop

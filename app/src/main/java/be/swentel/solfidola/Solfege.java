@@ -94,11 +94,13 @@ public class Solfege extends Fragment implements RecognitionListener {
     private boolean SetupListenerDone = false;
     private boolean speechMatchIsChecking = false;
     private TextView playbackMode;
+    private TextView intervalType;
     private TextView instrument;
     private TextView speech;
     private TextView speechOutput;
     private TextView exercise;
     private MusicBarView bar;
+    int intervalTypeSelected = 0;
     private boolean volumeOn = true;
     private boolean useMic = false;
     private ImageButton mic;
@@ -156,6 +158,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         speechOutput = view.findViewById(R.id.speechOutput);
         bar = view.findViewById(R.id.bar);
         playbackMode = view.findViewById(R.id.playbackMode);
+        intervalType = view.findViewById(R.id.intervalType);
         instrument = view.findViewById(R.id.instrument);
         choicesContainer = view.findViewById(R.id.choicesContainer);
         setHasOptionsMenu(true);
@@ -256,6 +259,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
 
         setPlaybackMode();
+        setIntervalType();
         setIntervals();
         drawClef();
         drawSignature();
@@ -290,6 +294,31 @@ public class Solfege extends Fragment implements RecognitionListener {
             mode = getString(R.string.harmonic);
         }
         playbackMode.setText(String.format(getString(R.string.playback_mode), mode.toLowerCase()));
+    }
+
+    private void setIntervalType() {
+        String interval;
+
+        if (e != null) {
+            intervalTypeSelected = e.getIntervalType();
+        }
+        else {
+            intervalTypeSelected = Preferences.getPreference(getContext(), "intervalType", 0);
+        }
+
+        switch (intervalTypeSelected) {
+            case 2:
+                interval = getString(R.string.random);
+                break;
+            case 1:
+                interval = getString(R.string.desc);
+                break;
+            case 0:
+            default:
+                interval = getString(R.string.asc);
+                break;
+        }
+        this.intervalType.setText(String.format(getString(R.string.interval_type), interval));
     }
 
     private void setProgram() {
@@ -448,9 +477,14 @@ public class Solfege extends Fragment implements RecognitionListener {
 
         ArrayList<Note> notes = new ArrayList<>();
         String scale = Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE);
+        boolean removeUnison = true;
 
         if (e != null) {
             notes.add(new Note(60, LOWER_C));
+
+            if (e.getIntervals().contains(0)) {
+                removeUnison = false;
+            }
 
             if (e.getIntervals().contains(1)) {
                 notes.add(new Note(61, LOWER_C));
@@ -517,7 +551,10 @@ public class Solfege extends Fragment implements RecognitionListener {
 
         // First note
         randomNotes.add(notes.get(0));
-        notes.remove(0);
+
+        if (removeUnison) {
+            notes.remove(0);
+        }
 
         // Second note.
         int randomIndex = randomGenerator.nextInt(notes.size());
@@ -651,6 +688,21 @@ public class Solfege extends Fragment implements RecognitionListener {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.solfege_menu, menu);
+
+        if (e != null) {
+
+            MenuItem choicesItem = menu.findItem(R.id.numberOfChoices);
+            if (choicesItem != null) {
+                choicesItem.setVisible(false);
+            }
+
+            MenuItem scaleItem = menu.findItem(R.id.scale);
+            if (scaleItem != null) {
+                scaleItem.setVisible(false);
+            }
+
+        }
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -731,6 +783,21 @@ public class Solfege extends Fragment implements RecognitionListener {
                 mDialog = mBuilder.create();
                 mDialog.show();
                 return true;
+            case R.id.interval:
+                final CharSequence[] intervalChoices = {getString(R.string.asc), getString(R.string.desc), getString(R.string.random)};
+                mBuilder.setTitle(R.string.interval);
+                int currentInterval = Preferences.getPreference(getContext(), "intervalType", 0);
+                mBuilder.setSingleChoiceItems(intervalChoices, currentInterval, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Preferences.setPreference(getContext(), "intervalType", i);
+                        dialogInterface.dismiss();
+                        doRenew();
+                    }
+                });
+                mDialog = mBuilder.create();
+                mDialog.show();
+                return true;
             case R.id.instrument:
                 int delta = 0;
                 int selectedIndex = 0;
@@ -786,7 +853,6 @@ public class Solfege extends Fragment implements RecognitionListener {
                         doRenew();
                     }
                 });
-
                 mDialog = mBuilder.create();
                 mDialog.show();
                 return true;
@@ -1013,6 +1079,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         speechMatchIsChecking = true;
 
         switch (s) {
+            case "prime":
             case "unison":
                 speechInterval = 0;
                 break;

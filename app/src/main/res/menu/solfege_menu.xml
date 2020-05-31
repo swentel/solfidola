@@ -17,6 +17,11 @@
         app:showAsAction="never" />
 
     <item
+        android:id="@+id/interval"
+        android:title="@string/interval"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/playback"
         android:title="@string/playback"
         app:showAsAction="never" />

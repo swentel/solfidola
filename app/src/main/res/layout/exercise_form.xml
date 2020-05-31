@@ -18,13 +18,48 @@
             android:layout_height="wrap_content" />
 
         <CheckBox
-            android:layout_marginBottom="20dp"
             android:text="@string/random_interval_form"
             android:id="@+id/addRandomInterval"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+        <TextView
+            android:textSize="@dimen/label"
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/interval" />
+
+        <RadioGroup
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:checked="true"
+                android:text="@string/asc"
+                android:id="@+id/intervalAsc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <RadioButton
+                android:checked="false"
+                android:text="@string/desc"
+                android:id="@+id/intervalDesc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <RadioButton
+                android:checked="false"
+                android:text="@string/random"
+                android:id="@+id/intervalRandom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RadioGroup>
+
         <LinearLayout android:orientation="vertical"
+            android:layout_marginTop="20dp"
             android:id="@+id/intervalContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

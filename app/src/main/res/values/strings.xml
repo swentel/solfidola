@@ -19,6 +19,11 @@
     <string name="harmonic">Harmonic</string>
     <string name="bar">Music bar</string>
     <string name="show_bar">Show music bar</string>
+    <string name="interval">Interval</string>
+    <string name="interval_type">Interval: %s</string>
+    <string name="asc">ascending</string>
+    <string name="desc">descending</string>
+    <string name="random">random</string>
     <string name="random_interval_form">Add random interval</string>
     <string name="random_interval">Random interval</string>
     <string name="instrument_selected">Instrument: %s</string>
@@ -32,6 +37,7 @@
     <string name="error_setup">Error setup: %s</string>
     <string name="timeout">Timeout on speech</string>
 
+    
     <string name="volume_off">Your volume is turned off</string>
     <string name="no_exercises">No exercises, create your first!</string>
     <string name="exercise_delete_confirm">Are you sure you want to delete this exercise?</string>
@@ -64,5 +70,11 @@
     <string name="sing_note">Sing %s</string>
     <string name="feedback_nice">Nice!</string>
     <string name="feedback_not_close">Not even close!</string>
+
+    <string-array name="interval_options">
+        <item>ascending</item>
+        <item>descending</item>
+        <item>random</item>
+    </string-array>
 
 </resources>

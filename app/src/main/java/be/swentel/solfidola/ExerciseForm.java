@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
 import android.widget.ScrollView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 
 import be.swentel.solfidola.Model.Exercise;
 import be.swentel.solfidola.Model.Interval;
+import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.db.DatabaseHelper;
 
@@ -68,6 +70,18 @@ public class ExerciseForm extends AppCompatActivity {
                         e.addInterval(intervals.get(j).getInterval());
                     }
                 }
+
+                int intervalType = 0;
+                e.setIntervalType(intervalType);
+                RadioButton desc = findViewById(R.id.intervalDesc);
+                if (desc.isChecked()) {
+                    intervalType = 1;
+                }
+                RadioButton random = findViewById(R.id.intervalRandom);
+                if (random.isChecked()) {
+                    intervalType = 2;
+                }
+                e.setIntervalType(intervalType);
 
                 if (e.getIntervals().size() > 1) {
                     e.flattenData();

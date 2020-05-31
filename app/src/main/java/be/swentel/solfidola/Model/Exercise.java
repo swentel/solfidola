@@ -14,6 +14,8 @@ public class Exercise extends Record {
     private int mistakes = 0;
     private int timer = 0;
     private int replays = 0;
+    // 0 = ascending, 1 = descending, 2 = random
+    private int intervalType = 0;
     private boolean showBar = false;
     private boolean randomInterval = false;
     private ArrayList<Integer> intervals = new ArrayList<>();
@@ -70,6 +72,14 @@ public class Exercise extends Record {
         this.randomInterval = randomInterval;
     }
 
+    public int getIntervalType() {
+        return intervalType;
+    }
+
+    public void setIntervalType(int intervalType) {
+        this.intervalType = intervalType;
+    }
+
     public boolean showBar() {
         return showBar;
     }
@@ -88,6 +98,10 @@ public class Exercise extends Record {
                 for (int i = 0; i < intervals.length(); i++) {
                     this.addInterval(intervals.getInt(i));
                 }
+            }
+
+            if (o.has("intervalType")) {
+                this.setIntervalType(o.getInt("intervalType"));
             }
 
             if (o.has("showBar")) {
@@ -131,6 +145,7 @@ public class Exercise extends Record {
             o.put("showBar", this.showBar());
             o.put("randomInterval", this.addRandomInterval());
             o.put("intervals", i);
+            o.put("intervalType", this.getIntervalType());
             o.put("timer", this.getTimer());
             o.put("replays", this.getReplays());
             o.put("mistakes", this.getMistakes());

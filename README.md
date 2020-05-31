@@ -8,12 +8,13 @@ Features:
 - Create exercises with selected intervals
   - show bar or not
   - add random non selected interval
+  -
 - Use voice commands in exercises
   - play/replay: plays the interval again
   - speak the interval for the right solution (in English):
-    minor second, major second, minor third (augmented second), major third, perfect fourth
-    diminished fifth (augmented fourth, tritone), perfect fifth, minor sixth (augmented fifth),
-    major sixth (diminished seventh), minor seventh, major seventh, octave
+    prime (unison), minor second, major second, minor third (augmented second), major third,
+    perfect fourth diminished fifth (augmented fourth, tritone), perfect fifth, minor sixth
+    (augmented fifth), major sixth (diminished seventh), minor seventh, major seventh, octave
 
 - Sound feedback when using the microphone
 - Auto plays the interval and refreshes when the right solution is selected
