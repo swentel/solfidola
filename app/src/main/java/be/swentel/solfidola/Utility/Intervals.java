@@ -1,14 +1,16 @@
 package be.swentel.solfidola.Utility;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 import be.swentel.solfidola.Model.Interval;
 
 public class Intervals {
 
-    public static ArrayList<Interval> list() {
+    public static ArrayList<Interval> list(boolean descending) {
         ArrayList<Interval> intervals = new ArrayList<>();
+
         intervals.add(new Interval(0, "Prime"));
         intervals.add(new Interval(1, "Minor second"));
         intervals.add(new Interval(2, "Major second"));
@@ -22,12 +24,17 @@ public class Intervals {
         intervals.add(new Interval(10, "Minor seventh"));
         intervals.add(new Interval(11, "Major seventh"));
         intervals.add(new Interval(12, "Octave"));
+
+        if (descending) {
+            Collections.reverse(intervals);
+        }
+
         return intervals;
     }
 
-    public static ArrayList<Interval> list(ArrayList<Integer> i, boolean addRandomInterval) {
+    public static ArrayList<Interval> list(ArrayList<Integer> i, boolean addRandomInterval, boolean descending) {
         ArrayList<Interval> intervals = new ArrayList<>();
-        ArrayList<Interval> intervalList = list();
+        ArrayList<Interval> intervalList = list(descending);
         ArrayList<Interval> intervalListToRemove = new ArrayList<>();
 
         for (Interval interval : intervalList) {

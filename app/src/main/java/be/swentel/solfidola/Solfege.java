@@ -100,7 +100,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     private TextView speechOutput;
     private TextView exercise;
     private MusicBarView bar;
-    int intervalTypeSelected = 0;
+    boolean intervalDescending = false;
     private boolean volumeOn = true;
     private boolean useMic = false;
     private ImageButton mic;
@@ -261,6 +261,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         setPlaybackMode();
         setIntervalType();
         setIntervals();
+        setNotes();
         drawClef();
         drawSignature();
         drawNotes();
@@ -298,6 +299,8 @@ public class Solfege extends Fragment implements RecognitionListener {
 
     private void setIntervalType() {
         String interval;
+        int intervalTypeSelected;
+        intervalDescending = false;
 
         if (e != null) {
             intervalTypeSelected = e.getIntervalType();
@@ -306,11 +309,14 @@ public class Solfege extends Fragment implements RecognitionListener {
             intervalTypeSelected = Preferences.getPreference(getContext(), "intervalType", 0);
         }
 
+        if (intervalTypeSelected == 2) {
+            Random rand = new Random();
+            intervalTypeSelected = rand.nextInt(2);
+        }
+
         switch (intervalTypeSelected) {
-            case 2:
-                interval = getString(R.string.random);
-                break;
             case 1:
+                intervalDescending = true;
                 interval = getString(R.string.desc);
                 break;
             case 0:
@@ -466,60 +472,75 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
     }
 
-    /**
-     * Draw notes.
-     */
-    private void drawNotes() {
-        boolean showBar = Preferences.getPreference(getContext(), "show_bar", true);
-        if (e != null) {
-            showBar = e.showBar();
-        }
-
+    private void setNotes() {
         ArrayList<Note> notes = new ArrayList<>();
         String scale = Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE);
-        boolean removeUnison = true;
+        boolean removeUnison = false;
 
         if (e != null) {
-            notes.add(new Note(60, LOWER_C));
 
-            if (e.getIntervals().contains(0)) {
-                removeUnison = false;
+            ArrayList<Integer> selectedIntervals = new ArrayList<>();
+            ArrayList<Integer> exerciseIntervals = e.getIntervals();
+
+            //Debug.debug("Extercise intervals: " + exerciseIntervals.toString());
+
+            for (Integer in : exerciseIntervals) {
+                if (intervalDescending) {
+                    in = 12 - in;
+                }
+                selectedIntervals.add(in);
             }
 
-            if (e.getIntervals().contains(1)) {
+            if (!intervalDescending && !selectedIntervals.contains(0)) {
+                selectedIntervals.add(0);
+                removeUnison = true;
+            }
+
+            if (intervalDescending && !selectedIntervals.contains(12)) {
+                selectedIntervals.add(12);
+                removeUnison = true;
+            }
+
+            //Debug.debug("Selected: " + selectedIntervals.toString());
+
+            if (selectedIntervals.contains(0)) {
+                notes.add(new Note(60, LOWER_C));
+            }
+
+            if (selectedIntervals.contains(1)) {
                 notes.add(new Note(61, LOWER_C));
             }
-            if (e.getIntervals().contains(2)) {
+            if (selectedIntervals.contains(2)) {
                 notes.add(new Note(62, LOWER_D));
             }
-            if (e.getIntervals().contains(3)) {
+            if (selectedIntervals.contains(3)) {
                 notes.add(new Note(63, LOWER_D));
             }
-            if (e.getIntervals().contains(4)) {
+            if (selectedIntervals.contains(4)) {
                 notes.add(new Note(64, LOWER_E));
             }
-            if (e.getIntervals().contains(5)) {
+            if (selectedIntervals.contains(5)) {
                 notes.add(new Note(65, LOWER_F));
             }
-            if (e.getIntervals().contains(6)) {
+            if (selectedIntervals.contains(6)) {
                 notes.add(new Note(66, LOWER_G));
             }
-            if (e.getIntervals().contains(7)) {
+            if (selectedIntervals.contains(7)) {
                 notes.add(new Note(67, LOWER_G));
             }
-            if (e.getIntervals().contains(8)) {
+            if (selectedIntervals.contains(8)) {
                 notes.add(new Note(68, HIGHER_A));
             }
-            if (e.getIntervals().contains(9)) {
+            if (selectedIntervals.contains(9)) {
                 notes.add(new Note(69, HIGHER_A));
             }
-            if (e.getIntervals().contains(10)) {
+            if (selectedIntervals.contains(10)) {
                 notes.add(new Note(70, HIGHER_B));
             }
-            if (e.getIntervals().contains(11)) {
+            if (selectedIntervals.contains(11)) {
                 notes.add(new Note(71, HIGHER_B));
             }
-            if (e.getIntervals().contains(12)) {
+            if (selectedIntervals.contains(12)) {
                 notes.add(new Note(72, HIGHER_C));
             }
         }
@@ -546,6 +567,14 @@ public class Solfege extends Fragment implements RecognitionListener {
             }
         }
 
+        if (intervalDescending) {
+            Collections.reverse(notes);
+        }
+
+        /*for (Note n: notes) {
+            Debug.debug("Added note: " + n.getMidiValue() + " - " + n.getNoteViewValue());
+        }*/
+
         randomNotes.clear();
         Random randomGenerator = new Random();
 
@@ -562,7 +591,24 @@ public class Solfege extends Fragment implements RecognitionListener {
         notes.remove(randomIndex);
 
         // Get interval.
-        interval = randomNotes.get(1).getMidiValue() - randomNotes.get(0).getMidiValue();
+        if (intervalDescending) {
+            interval = randomNotes.get(0).getMidiValue() - randomNotes.get(1).getMidiValue();
+        }
+        else {
+            interval = randomNotes.get(1).getMidiValue() - randomNotes.get(0).getMidiValue();
+        }
+        //Debug.debug("midi value: " + randomNotes.get(0).getMidiValue() + " - " + randomNotes.get(1).getMidiValue());
+        //Debug.debug("interval: " + interval);
+    }
+
+    /**
+     * Draw notes.
+     */
+    private void drawNotes() {
+        boolean showBar = Preferences.getPreference(getContext(), "show_bar", true);
+        if (e != null) {
+            showBar = e.showBar();
+        }
 
         if (showBar) {
             bar.setVisibility(View.VISIBLE);
@@ -642,7 +688,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         intervals.clear();
 
         if (e != null) {
-            intervals = Intervals.list(e.getIntervals(), e.addRandomInterval());
+            intervals = Intervals.list(e.getIntervals(), e.addRandomInterval(), intervalDescending);
             exercise.setVisibility(View.VISIBLE);
             ArrayList<String> text = new ArrayList<>();
             for (Interval i : intervals) {
@@ -656,7 +702,7 @@ public class Solfege extends Fragment implements RecognitionListener {
             exercise.setText(String.format(getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
         }
         else {
-            intervals = Intervals.list();
+            intervals = Intervals.list(intervalDescending);
         }
     }
 

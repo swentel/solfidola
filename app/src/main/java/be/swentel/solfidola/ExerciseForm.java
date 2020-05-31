@@ -35,7 +35,7 @@ public class ExerciseForm extends AppCompatActivity {
 
         root = findViewById(R.id.root);
         intervalContainer = findViewById(R.id.intervalContainer);
-        intervals = Intervals.list();
+        intervals = Intervals.list(false);
 
         for (int i = 0; i < intervals.size(); i++) {
             CheckBox ch = new CheckBox(this);
