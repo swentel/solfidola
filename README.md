@@ -12,7 +12,7 @@ Features:
 - Use voice commands in exercises
   - play/replay: plays the interval again
   - speak the interval for the right solution (in English):
-    prime (unison), minor second, major second, minor third (augmented second), major third,
+    unison (prime), minor second, major second, minor third (augmented second), major third,
     perfect fourth diminished fifth (augmented fourth, tritone), perfect fifth, minor sixth
     (augmented fifth), major sixth (diminished seventh), minor seventh, major seventh, octave
 

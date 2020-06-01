@@ -11,7 +11,7 @@ public class Intervals {
     public static ArrayList<Interval> list(boolean descending) {
         ArrayList<Interval> intervals = new ArrayList<>();
 
-        intervals.add(new Interval(0, "Prime"));
+        intervals.add(new Interval(0, "Unison"));
         intervals.add(new Interval(1, "Minor second"));
         intervals.add(new Interval(2, "Major second"));
         intervals.add(new Interval(3, "Minor third"));
