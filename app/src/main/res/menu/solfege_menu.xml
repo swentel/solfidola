@@ -26,6 +26,11 @@
         android:title="@string/playback"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/root"
+        android:title="@string/root"
+        app:showAsAction="never" />
+
     <!--<item
         android:id="@+id/scale"
         android:title="@string/scale"

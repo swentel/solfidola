@@ -61,7 +61,6 @@ import be.swentel.solfidola.SheetMusicView.ClefView;
 import be.swentel.solfidola.SheetMusicView.MusicBarView;
 import be.swentel.solfidola.SheetMusicView.NoteData;
 import be.swentel.solfidola.SheetMusicView.NoteView;
-import be.swentel.solfidola.SheetMusicView.SignatureView;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.Utility.Preferences;
 import be.swentel.solfidola.db.DatabaseHelper;
@@ -95,8 +94,9 @@ public class Solfege extends Fragment implements RecognitionListener {
     private boolean speechMatchIsChecking = false;
     private TextView playbackMode;
     private TextView intervalType;
+    private TextView root;
+    private TextView rounds;
     private TextView instrument;
-    private TextView speech;
     private TextView speechOutput;
     private TextView exercise;
     private MusicBarView bar;
@@ -119,6 +119,8 @@ public class Solfege extends Fragment implements RecognitionListener {
     private List<Button> choices = new ArrayList<>();
     private ArrayList<Note> randomNotes = new ArrayList<>();
     private ArrayList<Interval> intervals = new ArrayList<>();
+    public static final int DEFAULT_ROUNDS = 3;
+    public static final int DEFAULT_ROOT = 2;
     public static final int PLAYBACK_MELODIC = 0;
     public static final int PLAYBACK_HARMONIC = 1;
     private static final int DEFAULT_PROGRAM = 0;
@@ -155,12 +157,13 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
         requireActivity().setTitle(title);
 
-        layout = view.findViewById(R.id.root);
-        speech = view.findViewById(R.id.speech);
+        layout = view.findViewById(R.id.layout_root);
         speechOutput = view.findViewById(R.id.speechOutput);
         bar = view.findViewById(R.id.bar);
         playbackMode = view.findViewById(R.id.playbackMode);
         intervalType = view.findViewById(R.id.intervalType);
+        root = view.findViewById(R.id.root);
+        rounds = view.findViewById(R.id.rounds);
         instrument = view.findViewById(R.id.instrument);
         choicesContainer = view.findViewById(R.id.choicesContainer);
         setHasOptionsMenu(true);
@@ -198,7 +201,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (e != null && volumeOn) {
+                if (isExercise() && volumeOn) {
                     e.setReplays(e.getReplays() + 1);
                     saveExercise();
                 }
@@ -208,7 +211,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         });
 
         mic = view.findViewById(R.id.mic);
-        if (e != null) {
+        if (isExercise()) {
             useMic = Preferences.getPreference(getContext(), "useMic", false);
             mic.setOnClickListener(new onMicClickListener());
             setMicState();
@@ -255,12 +258,14 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
 
         hasClicked = false;
-        if (e != null) {
+        if (isExercise()) {
             e.setAttempts(e.getAttempts() + 1);
             saveExercise();
         }
 
         setPlaybackMode();
+        setRoot();
+        setRounds();
         setIntervalType();
         setIntervals();
         setNotes();
@@ -293,7 +298,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     private void setPlaybackMode() {
         String mode = getString(R.string.melodic);
         sleep = Preferences.getPreference(getContext(), "playback", PLAYBACK_MELODIC) == PLAYBACK_MELODIC;
-        if (e != null) {
+        if (isExercise()) {
             sleep = e.getPlaybackMode() == PLAYBACK_MELODIC;
         }
         if (!sleep) {
@@ -302,12 +307,30 @@ public class Solfege extends Fragment implements RecognitionListener {
         playbackMode.setText(String.format(getString(R.string.playback_mode), mode.toLowerCase()));
     }
 
+    private void setRoot() {
+        String root_value = "C";
+        if (isExercise()) {
+            String[] rootArray = getResources().getStringArray(R.array.root_options);
+            root_value = rootArray[e.getRoot()];
+        }
+        root.setText(String.format(getString(R.string.root_value), root_value));
+    }
+
+    private void setRounds() {
+        if (isExercise()) {
+            rounds.setVisibility(View.VISIBLE);
+            String[] roundsArray = getResources().getStringArray(R.array.round_options);
+            String rounds_value = roundsArray[e.getRounds()];
+            rounds.setText(String.format(getString(R.string.rounds_value), rounds_value));
+        }
+    }
+
     private void setIntervalType() {
         String interval;
         int intervalTypeSelected;
         intervalDescending = false;
 
-        if (e != null) {
+        if (isExercise()) {
             intervalTypeSelected = e.getIntervalType();
         }
         else {
@@ -344,7 +367,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         int numberOfChoices = Preferences.getPreference(getContext(), "numberOfChoices", DEFAULT_CHOICES);
 
         // Limit choices to the number of intervals in the exercise.
-        if (e != null) {
+        if (isExercise()) {
             numberOfChoices = e.getIntervals().size();
             if (e.addRandomInterval()) {
                 numberOfChoices++;
@@ -403,7 +426,7 @@ public class Solfege extends Fragment implements RecognitionListener {
             b.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (e != null) {
+                    if (isExercise()) {
                         hasClicked = true;
                         e.setMistakes(e.getMistakes() + 1);
                         saveExercise();
@@ -422,7 +445,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         int numberOfButtons = 0;
 
         // In an exercise, sort by interval asc, otherwise random.
-        if (e != null) {
+        if (isExercise()) {
             Collections.sort(choices, new Comparator<Button>() {
                 @Override
                 public int compare(Button b1, Button b2) {
@@ -482,7 +505,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         String scale = Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE);
         boolean removeUnison = false;
 
-        if (e != null) {
+        if (isExercise()) {
 
             ArrayList<Integer> selectedIntervals = new ArrayList<>();
             ArrayList<Integer> exerciseIntervals = e.getIntervals();
@@ -611,7 +634,7 @@ public class Solfege extends Fragment implements RecognitionListener {
      */
     private void drawNotes() {
         boolean showBar = Preferences.getPreference(getContext(), "show_bar", true);
-        if (e != null) {
+        if (isExercise()) {
             showBar = e.showBar();
         }
 
@@ -691,7 +714,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     private void setIntervals() {
         intervals.clear();
 
-        if (e != null) {
+        if (isExercise()) {
             intervals = Intervals.list(e.getIntervals(), e.addRandomInterval(), intervalDescending);
             exercise.setVisibility(View.VISIBLE);
             ArrayList<String> text = new ArrayList<>();
@@ -718,7 +741,7 @@ public class Solfege extends Fragment implements RecognitionListener {
             synthesizer.close();
         }
 
-        if (e != null) {
+        if (isExercise()) {
 
             if (!hasClicked) {
                 e.setAttempts(e.getAttempts() - 1);
@@ -739,7 +762,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.solfege_menu, menu);
 
-        if (e != null) {
+        if (isExercise()) {
 
             ArrayList<Integer> menuOptions = new ArrayList<>();
             menuOptions.add(R.id.numberOfChoices);
@@ -748,6 +771,7 @@ public class Solfege extends Fragment implements RecognitionListener {
             menuOptions.add(R.id.interval);
             menuOptions.add(R.id.playback);
             menuOptions.add(R.id.scale);
+            menuOptions.add(R.id.root);
 
             MenuItem item;
             for (Integer id : menuOptions) {
@@ -926,6 +950,10 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
     }
 
+    private boolean isExercise() {
+        return e != null;
+    }
+
     private void stopSoundPool() {
         if (soundPoolLoaded) {
             soundPool.release();
@@ -984,11 +1012,8 @@ public class Solfege extends Fragment implements RecognitionListener {
      * Set the mic state.
      */
     private void setMicState() {
-        String usesMic = getString(R.string.no);
-        speech.setVisibility(View.VISIBLE);
         if (useMic) {
             if (requestPermission()) {
-                usesMic = getString(R.string.yes);
                 setupSoundPool();
                 setSpeechOutput(getString(R.string.setup));
                 mic.setBackgroundResource(R.drawable.mic_on);
@@ -1000,7 +1025,6 @@ public class Solfege extends Fragment implements RecognitionListener {
             stopListening();
             mic.setBackgroundResource(R.drawable.mic_off);
         }
-        speech.setText(String.format(getString(R.string.speech_info), usesMic));
     }
 
     private void setMicStateError(String error) {
@@ -1207,7 +1231,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
 
         if (s.equals("play") || s.equals("replay")) {
-            if (e != null && volumeOn) {
+            if (isExercise() && volumeOn) {
                 e.setReplays(e.getReplays() + 1);
                 saveExercise();
             }

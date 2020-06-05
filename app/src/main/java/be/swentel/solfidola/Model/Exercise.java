@@ -6,6 +6,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static be.swentel.solfidola.Solfege.DEFAULT_ROOT;
+import static be.swentel.solfidola.Solfege.DEFAULT_ROUNDS;
 import static be.swentel.solfidola.Solfege.PLAYBACK_MELODIC;
 import static be.swentel.solfidola.db.DatabaseHelper.DATA_TYPE_EXERCISE;
 
@@ -17,8 +19,10 @@ public class Exercise extends Record {
     private int replays = 0;
     // 0 = ascending, 1 = descending, 2 = random
     private int intervalType = 0;
+    private int root = DEFAULT_ROOT;
     private boolean showBar = false;
     private boolean randomInterval = false;
+    private int rounds = DEFAULT_ROUNDS;
     private ArrayList<Integer> intervals = new ArrayList<>();
     private int playbackMode = PLAYBACK_MELODIC;
 
@@ -94,6 +98,22 @@ public class Exercise extends Record {
         return playbackMode;
     }
 
+    public int getRoot() {
+        return root;
+    }
+
+    public void setRoot(int root) {
+        this.root = root;
+    }
+
+    public int getRounds() {
+        return rounds;
+    }
+
+    public void setRounds(int rounds) {
+        this.rounds = rounds;
+    }
+
     public void setPlaybackMode(int playbackMode) {
         this.playbackMode = playbackMode;
     }
@@ -141,6 +161,14 @@ public class Exercise extends Record {
             if (o.has("playbackMode")) {
                 this.setPlaybackMode(o.getInt("playbackMode"));
             }
+
+            if (o.has("root")) {
+                this.setRoot(o.getInt("root"));
+            }
+
+            if (o.has("rounds")) {
+                this.setRounds(o.getInt("rounds"));
+            }
         }
         catch (JSONException ignored) { }
     }
@@ -165,7 +193,8 @@ public class Exercise extends Record {
             o.put("mistakes", this.getMistakes());
             o.put("attempts", this.getAttempts());
             o.put("playbackMode", this.getPlaybackMode());
-
+            o.put("root", this.getRoot());
+            o.put("rounds", this.getRounds());
         }
         catch (JSONException ignored) { }
         this.setData(o.toString());

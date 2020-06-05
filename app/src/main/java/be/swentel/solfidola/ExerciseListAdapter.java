@@ -63,6 +63,8 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
         int position;
         TextView intervals;
         TextView intervalType;
+        TextView root;
+        TextView rounds;
         TextView playbackMode;
         TextView date;
         TextView stats;
@@ -80,6 +82,8 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             holder.row = convertView.findViewById(R.id.list_item_row);
             holder.intervals = convertView.findViewById(R.id.list_intervals);
             holder.intervalType = convertView.findViewById(R.id.list_interval_type);
+            holder.root = convertView.findViewById(R.id.list_interval_root);
+            holder.rounds = convertView.findViewById(R.id.list_interval_rounds);
             holder.playbackMode = convertView.findViewById(R.id.list_playback_mode);
             holder.stats = convertView.findViewById(R.id.list_stats);
             holder.date = convertView.findViewById(R.id.list_date);
@@ -110,6 +114,16 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
                 text.add(context.getString(R.string.random_interval));
             }
             holder.intervals.setText(String.format(context.getString(R.string.intervals), text.toString().replace("[", "").replace("]", "")));
+
+            // Root.
+            String[] rootArray = context.getResources().getStringArray(R.array.root_options);
+            String root_value = rootArray[exercise.getRoot()];
+            holder.root.setText(String.format(context.getString(R.string.root_value), root_value));
+
+            // Rounds.
+            String[] roundsArray = context.getResources().getStringArray(R.array.round_options);
+            String rounds_value = roundsArray[exercise.getRounds()];
+            holder.rounds.setText(String.format(context.getString(R.string.rounds_value), rounds_value));
 
             // Interval type.
             String interval;

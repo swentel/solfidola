@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
-    android:id="@+id/root"
+    android:id="@+id/layout_root"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     xmlns:android="http://schemas.android.com/apk/res/android">
@@ -14,12 +14,6 @@
         <CheckBox
             android:text="@string/show_bar"
             android:id="@+id/showBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <CheckBox
-            android:text="@string/random_interval_form"
-            android:id="@+id/addRandomInterval"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
@@ -85,6 +79,43 @@
                 android:layout_height="wrap_content" />
 
         </RadioGroup>
+
+        <TextView
+            android:textSize="@dimen/label"
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/root" />
+
+        <Spinner
+            android:id="@+id/root"
+            android:prompt="@string/root"
+            android:spinnerMode="dialog"
+            android:entries="@array/root_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:textSize="@dimen/label"
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rounds" />
+
+        <Spinner
+            android:id="@+id/rounds"
+            android:prompt="@string/rounds"
+            android:spinnerMode="dialog"
+            android:entries="@array/round_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:layout_marginTop="10dp"
+            android:text="@string/random_interval_form"
+            android:id="@+id/addRandomInterval"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <LinearLayout android:orientation="vertical"
             android:id="@+id/intervalContainer"

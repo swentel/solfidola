@@ -9,6 +9,7 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -21,13 +22,17 @@ import be.swentel.solfidola.Model.Interval;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.db.DatabaseHelper;
 
+import static be.swentel.solfidola.Solfege.DEFAULT_ROOT;
+import static be.swentel.solfidola.Solfege.DEFAULT_ROUNDS;
 import static be.swentel.solfidola.Solfege.PLAYBACK_HARMONIC;
 import static be.swentel.solfidola.Solfege.PLAYBACK_MELODIC;
 
 public class ExerciseForm extends AppCompatActivity {
 
-    ScrollView root;
+    ScrollView rootLayout;
     LinearLayout intervalContainer;
+    Spinner root;
+    Spinner rounds;
     private ArrayList<Interval> intervals = new ArrayList<>();
 
     @Override
@@ -35,9 +40,13 @@ public class ExerciseForm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.exercise_form);
 
-        root = findViewById(R.id.root);
+        rootLayout = findViewById(R.id.layout_root);
         intervalContainer = findViewById(R.id.intervalContainer);
         intervals = Intervals.list(false);
+        rounds = findViewById(R.id.rounds);
+        rounds.setSelection(DEFAULT_ROUNDS);
+        root = findViewById(R.id.root);
+        root.setSelection(DEFAULT_ROOT);
 
         for (int i = 0; i < intervals.size(); i++) {
             CheckBox ch = new CheckBox(this);
@@ -91,6 +100,9 @@ public class ExerciseForm extends AppCompatActivity {
                 }
                 e.setPlaybackMode(playbackMode);
 
+                e.setRoot(root.getSelectedItemPosition());
+                e.setRounds(rounds.getSelectedItemPosition());
+
                 if (e.getIntervals().size() > 1) {
                     e.flattenData();
                     DatabaseHelper db = new DatabaseHelper(getApplicationContext());
@@ -101,7 +113,7 @@ public class ExerciseForm extends AppCompatActivity {
                     finish();
                 }
                 else {
-                    Snackbar.make(root, getString(R.string.interval_select), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(rootLayout, getString(R.string.interval_select), Snackbar.LENGTH_LONG).show();
                 }
             }
         });

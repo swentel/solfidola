@@ -14,7 +14,7 @@ Features:
   - limit number per session
 - Use voice commands in exercises
   - play/replay: plays the interval again
-  - pause/resume: pauses or resumes the exercise
+  - pause/resume/stop: pauses, resumes or stops the exercise
   - speak the interval for the right solution (in English):
     unison (prime), minor second, major second, minor third (augmented second), major third,
     perfect fourth diminished fifth (augmented fourth, tritone), perfect fifth, minor sixth

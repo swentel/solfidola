@@ -1,43 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:padding="10dp"
-    android:id="@+id/root"
+    android:id="@+id/layout_root"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <TextView
+        android:textSize="18sp"
+        android:id="@+id/root"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
         android:visibility="gone"
-        android:layout_marginTop="5dp"
         android:textSize="18sp"
         android:id="@+id/exercise"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
-        android:layout_marginTop="5dp"
-        android:textSize="18sp"
-        android:id="@+id/speech"
-        android:visibility="gone"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:layout_marginTop="5dp"
         android:textSize="18sp"
         android:id="@+id/intervalType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
-        android:layout_marginTop="5dp"
+        android:textSize="18sp"
+        android:id="@+id/rounds"
+        android:visibility="gone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
         android:textSize="18sp"
         android:id="@+id/playbackMode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <TextView
-        android:layout_marginTop="5dp"
         android:textSize="18sp"
         android:id="@+id/instrument"
         android:layout_width="wrap_content"

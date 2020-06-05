@@ -13,6 +13,12 @@
         android:layout_width="fill_parent" />
 
     <TextView
+        android:textSize="@dimen/list_item_text_size"
+        android:id="@+id/list_interval_root"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
         android:id="@+id/list_intervals"
         android:layout_height="wrap_content"
         android:textColor="@color/textColor"
@@ -25,6 +31,12 @@
         android:textColor="@color/textColor"
         android:textSize="@dimen/list_item_text_size"
         android:layout_width="fill_parent" />
+
+    <TextView
+        android:textSize="@dimen/list_item_text_size"
+        android:id="@+id/list_interval_rounds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <TextView
         android:id="@+id/list_playback_mode"
