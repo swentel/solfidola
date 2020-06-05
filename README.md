@@ -5,17 +5,20 @@ Solfège and more!
 Features:
 
 - Random interval training
-- Create exercises with selected intervals
+- Create exercises
+  - select intervals
   - show bar or not
   - add random non selected interval
-  -
+  - ascending, descending or random
+  - playback mode (melodic or harmonic)
+  - limit number per session
 - Use voice commands in exercises
   - play/replay: plays the interval again
+  - pause/resume: pauses or resumes the exercise
   - speak the interval for the right solution (in English):
     unison (prime), minor second, major second, minor third (augmented second), major third,
     perfect fourth diminished fifth (augmented fourth, tritone), perfect fifth, minor sixth
     (augmented fifth), major sixth (diminished seventh), minor seventh, major seventh, octave
-
 - Sound feedback when using the microphone
 - Auto plays the interval and refreshes when the right solution is selected
 - Tuner: still in experimental state (sing note C)

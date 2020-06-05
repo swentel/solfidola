@@ -465,8 +465,8 @@ public class Solfege extends Fragment implements RecognitionListener {
     }
 
     private void drawSignature() {
-        String scale = Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE);
-        if (scale.equals("Cmin")) {
+        //String scale = Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE);
+        /*if (scale.equals("Cmin")) {
             // TODO use constants.
             SignatureView s = new SignatureView(getContext(), "flat", 7);
             bar.addView(s);
@@ -474,7 +474,7 @@ public class Solfege extends Fragment implements RecognitionListener {
             bar.addView(s);
             s = new SignatureView(getContext(), "flat",6);
             bar.addView(s);
-        }
+        }*/
     }
 
     private void setNotes() {
@@ -550,7 +550,7 @@ public class Solfege extends Fragment implements RecognitionListener {
             }
         }
         else {
-            if (scale.equals("Cmin")) {
+            /*if (scale.equals("Cmin")) {
                 notes.add(new Note(60, LOWER_C));
                 notes.add(new Note(62, LOWER_D));
                 notes.add(new Note(63, LOWER_E));
@@ -560,7 +560,7 @@ public class Solfege extends Fragment implements RecognitionListener {
                 notes.add(new Note(70, HIGHER_B));
                 notes.add(new Note(72, HIGHER_C));
             }
-            else {
+            else {*/
                 notes.add(new Note(60, LOWER_C));
                 notes.add(new Note(62, LOWER_D));
                 notes.add(new Note(64, LOWER_E));
@@ -569,7 +569,7 @@ public class Solfege extends Fragment implements RecognitionListener {
                 notes.add(new Note(69, HIGHER_A));
                 notes.add(new Note(71, HIGHER_B));
                 notes.add(new Note(72, HIGHER_C));
-            }
+            //}
         }
 
         if (intervalDescending) {

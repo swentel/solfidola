@@ -18,6 +18,7 @@ triton
 try
 tone
 prime
+resume
 play
 replay
 stop
