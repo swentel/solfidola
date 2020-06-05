@@ -47,7 +47,7 @@
     <string name="stats">Score: %d/%d - Replays: %d - Time: %s</string>
     <string name="interval_select">Select at least two intervals</string>
     <string name="exercise_created">Exercise created</string>
-    <string name="exercise">Exercise: %s</string>
+    <string name="intervals">Intervals: %s</string>
     <string name="exercise_last_test">Last test: %s</string>
     <string name="exercising">Exercising</string>
     <string name="match_exact">Exact match: %s</string>

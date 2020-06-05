@@ -6,6 +6,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import static be.swentel.solfidola.Solfege.PLAYBACK_MELODIC;
 import static be.swentel.solfidola.db.DatabaseHelper.DATA_TYPE_EXERCISE;
 
 public class Exercise extends Record {
@@ -19,6 +20,7 @@ public class Exercise extends Record {
     private boolean showBar = false;
     private boolean randomInterval = false;
     private ArrayList<Integer> intervals = new ArrayList<>();
+    private int playbackMode = PLAYBACK_MELODIC;
 
     public Exercise() {
         this.setType(DATA_TYPE_EXERCISE);
@@ -88,6 +90,14 @@ public class Exercise extends Record {
         this.showBar = showBar;
     }
 
+    public int getPlaybackMode() {
+        return playbackMode;
+    }
+
+    public void setPlaybackMode(int playbackMode) {
+        this.playbackMode = playbackMode;
+    }
+
     public void prepareData(String data) {
         this.setData(data);
         try {
@@ -127,6 +137,10 @@ public class Exercise extends Record {
             if (o.has("timer")) {
                 this.setTimer(o.getInt("timer"));
             }
+
+            if (o.has("playbackMode")) {
+                this.setPlaybackMode(o.getInt("playbackMode"));
+            }
         }
         catch (JSONException ignored) { }
     }
@@ -150,6 +164,7 @@ public class Exercise extends Record {
             o.put("replays", this.getReplays());
             o.put("mistakes", this.getMistakes());
             o.put("attempts", this.getAttempts());
+            o.put("playbackMode", this.getPlaybackMode());
 
         }
         catch (JSONException ignored) { }

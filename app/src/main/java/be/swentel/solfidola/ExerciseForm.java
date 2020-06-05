@@ -18,9 +18,11 @@ import java.util.ArrayList;
 
 import be.swentel.solfidola.Model.Exercise;
 import be.swentel.solfidola.Model.Interval;
-import be.swentel.solfidola.Utility.Debug;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.db.DatabaseHelper;
+
+import static be.swentel.solfidola.Solfege.PLAYBACK_HARMONIC;
+import static be.swentel.solfidola.Solfege.PLAYBACK_MELODIC;
 
 public class ExerciseForm extends AppCompatActivity {
 
@@ -72,7 +74,6 @@ public class ExerciseForm extends AppCompatActivity {
                 }
 
                 int intervalType = 0;
-                e.setIntervalType(intervalType);
                 RadioButton desc = findViewById(R.id.intervalDesc);
                 if (desc.isChecked()) {
                     intervalType = 1;
@@ -82,6 +83,13 @@ public class ExerciseForm extends AppCompatActivity {
                     intervalType = 2;
                 }
                 e.setIntervalType(intervalType);
+
+                int playbackMode = PLAYBACK_MELODIC;
+                RadioButton harmonic = findViewById(R.id.playbackModeHarmonic);
+                if (harmonic.isChecked()) {
+                    playbackMode = PLAYBACK_HARMONIC;
+                }
+                e.setPlaybackMode(playbackMode);
 
                 if (e.getIntervals().size() > 1) {
                     e.flattenData();

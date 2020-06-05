@@ -58,6 +58,34 @@
 
         </RadioGroup>
 
+        <TextView
+            android:textSize="@dimen/label"
+            android:layout_marginStart="5dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/playback" />
+
+        <RadioGroup
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:checked="true"
+                android:text="@string/melodic"
+                android:id="@+id/playbackModeMelodic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <RadioButton
+                android:checked="false"
+                android:text="@string/harmonic"
+                android:id="@+id/playbackModeHarmonic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </RadioGroup>
+
         <LinearLayout android:orientation="vertical"
             android:layout_marginTop="20dp"
             android:id="@+id/intervalContainer"

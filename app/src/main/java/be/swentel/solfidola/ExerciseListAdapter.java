@@ -29,6 +29,8 @@ import be.swentel.solfidola.Utility.Formatter;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.db.DatabaseHelper;
 
+import static be.swentel.solfidola.Solfege.PLAYBACK_HARMONIC;
+
 public class ExerciseListAdapter extends BaseAdapter implements OnClickListener {
 
     private final Context context;
@@ -61,6 +63,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
         int position;
         TextView intervals;
         TextView intervalType;
+        TextView playbackMode;
         TextView date;
         TextView stats;
         Button play;
@@ -77,6 +80,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             holder.row = convertView.findViewById(R.id.list_item_row);
             holder.intervals = convertView.findViewById(R.id.list_intervals);
             holder.intervalType = convertView.findViewById(R.id.list_interval_type);
+            holder.playbackMode = convertView.findViewById(R.id.list_playback_mode);
             holder.stats = convertView.findViewById(R.id.list_stats);
             holder.date = convertView.findViewById(R.id.list_date);
             holder.play = convertView.findViewById(R.id.play);
@@ -105,7 +109,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             if (exercise.addRandomInterval()) {
                 text.add(context.getString(R.string.random_interval));
             }
-            holder.intervals.setText(String.format(context.getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
+            holder.intervals.setText(String.format(context.getString(R.string.intervals), text.toString().replace("[", "").replace("]", "")));
 
             // Interval type.
             String interval;
@@ -122,6 +126,13 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
                     break;
             }
             holder.intervalType.setText(String.format(context.getString(R.string.interval_type), interval));
+
+            // Playback mode.
+            String playbackMode = context.getString(R.string.melodic);
+            if (exercise.getPlaybackMode() == PLAYBACK_HARMONIC) {
+                playbackMode = context.getString(R.string.harmonic);
+            }
+            holder.playbackMode.setText(String.format(context.getString(R.string.playback_mode), playbackMode));
 
             // Stats.
             int success = exercise.getAttempts() - exercise.getMistakes();

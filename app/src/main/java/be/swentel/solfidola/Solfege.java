@@ -113,12 +113,14 @@ public class Solfege extends Fragment implements RecognitionListener {
     private int soundIdSuccess;
     private int soundIdWrong;
     private float volume;
+    boolean sleep = false;
     private static final int streamType = AudioManager.STREAM_MUSIC;
     private static final int MAX_STREAMS = 2;
     private List<Button> choices = new ArrayList<>();
     private ArrayList<Note> randomNotes = new ArrayList<>();
     private ArrayList<Interval> intervals = new ArrayList<>();
-    private static final int PLAYBACK_MELODIC = 0;
+    public static final int PLAYBACK_MELODIC = 0;
+    public static final int PLAYBACK_HARMONIC = 1;
     private static final int DEFAULT_PROGRAM = 0;
     private static final int DEFAULT_CHOICES = 4;
     private static final String DEFAULT_INSTRUMENT = "Standard";
@@ -290,7 +292,10 @@ public class Solfege extends Fragment implements RecognitionListener {
 
     private void setPlaybackMode() {
         String mode = getString(R.string.melodic);
-        boolean sleep = Preferences.getPreference(getContext(), "playback", PLAYBACK_MELODIC) == PLAYBACK_MELODIC;
+        sleep = Preferences.getPreference(getContext(), "playback", PLAYBACK_MELODIC) == PLAYBACK_MELODIC;
+        if (e != null) {
+            sleep = e.getPlaybackMode() == PLAYBACK_MELODIC;
+        }
         if (!sleep) {
             mode = getString(R.string.harmonic);
         }
@@ -628,7 +633,6 @@ public class Solfege extends Fragment implements RecognitionListener {
      */
     private void play(ArrayList<Note> notes) {
         long TIMESTAMP = -1;
-        boolean melodic = Preferences.getPreference(getContext(), "playback", PLAYBACK_MELODIC) == PLAYBACK_MELODIC;
 
         if (startTime == 0) {
             startTime = (int) System.currentTimeMillis()/1000;
@@ -637,7 +641,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         try {
 
             int channel = 0;
-            if (melodic) {
+            if (sleep) {
                 ShortMessage msg = new ShortMessage();
                 msg.setMessage(ShortMessage.NOTE_ON, channel, notes.get(0).getMidiValue(), 127);
                 receiver.send(msg, TIMESTAMP);
@@ -699,7 +703,7 @@ public class Solfege extends Fragment implements RecognitionListener {
             if (e.addRandomInterval()) {
                 text.add(getString(R.string.random_interval));
             }
-            exercise.setText(String.format(getString(R.string.exercise), text.toString().replace("[", "").replace("]", "")));
+            exercise.setText(String.format(getString(R.string.intervals), text.toString().replace("[", "").replace("]", "")));
         }
         else {
             intervals = Intervals.list(intervalDescending);
@@ -737,16 +741,21 @@ public class Solfege extends Fragment implements RecognitionListener {
 
         if (e != null) {
 
-            MenuItem choicesItem = menu.findItem(R.id.numberOfChoices);
-            if (choicesItem != null) {
-                choicesItem.setVisible(false);
-            }
+            ArrayList<Integer> menuOptions = new ArrayList<>();
+            menuOptions.add(R.id.numberOfChoices);
+            menuOptions.add(R.id.scale);
+            menuOptions.add(R.id.sheetMusic);
+            menuOptions.add(R.id.interval);
+            menuOptions.add(R.id.playback);
+            menuOptions.add(R.id.scale);
 
-            MenuItem scaleItem = menu.findItem(R.id.scale);
-            if (scaleItem != null) {
-                scaleItem.setVisible(false);
+            MenuItem item;
+            for (Integer id : menuOptions) {
+                item = menu.findItem(id);
+                if (item != null) {
+                    item.setVisible(false);
+                }
             }
-
         }
 
         super.onCreateOptionsMenu(menu, inflater);
