@@ -25,6 +25,7 @@ import java.util.List;
 
 import be.swentel.solfidola.Model.Exercise;
 import be.swentel.solfidola.Model.Interval;
+import be.swentel.solfidola.Utility.Formatter;
 import be.swentel.solfidola.Utility.Intervals;
 import be.swentel.solfidola.db.DatabaseHelper;
 
@@ -124,7 +125,8 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
 
             // Stats.
             int success = exercise.getAttempts() - exercise.getMistakes();
-            String stats = String.format(context.getString(R.string.stats), success, exercise.getAttempts(), exercise.getReplays(), exercise.getTimer());
+            String elapsed = Formatter.elapsedTime(exercise.getTimer());
+            String stats = String.format(context.getString(R.string.stats), success, exercise.getAttempts(), exercise.getReplays(), elapsed);
             holder.stats.setText(stats);
 
             // Published
