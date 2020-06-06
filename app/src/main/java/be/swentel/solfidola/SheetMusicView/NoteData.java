@@ -29,7 +29,7 @@ public class NoteData {
         }
 
         public boolean greaterThanHigherB() {
-            return value >= DOUBLE_HIGH_B.getValue();
+            return value >= HIGHER_B.getValue();
         }
     }
 

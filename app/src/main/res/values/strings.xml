@@ -8,6 +8,7 @@
 
     <string name="no">No</string>
     <string name="yes">yes</string>
+    <string name="debug">Debug</string>
     <string name="close">Close</string>
     <string name="drawer_title">Menu</string>
     <string name="menu_solfege">Solfege</string>

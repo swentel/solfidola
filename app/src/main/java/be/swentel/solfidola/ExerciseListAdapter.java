@@ -158,7 +158,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             @SuppressLint("SimpleDateFormat")
             SimpleDateFormat formatIn = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             @SuppressLint("SimpleDateFormat")
-            SimpleDateFormat formatOut = new SimpleDateFormat("dd MM yyyy HH:mm");
+            SimpleDateFormat formatOut = new SimpleDateFormat("dd/MM/yyyy HH:mm");
             try {
                 holder.date.setVisibility(View.VISIBLE);
                 Date result = formatIn.parse(exercise.getTimestamp());

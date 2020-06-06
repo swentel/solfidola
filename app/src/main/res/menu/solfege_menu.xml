@@ -31,4 +31,9 @@
         android:title="@string/instrument"
         app:showAsAction="never" />
 
+    <item
+        android:id="@+id/debug"
+        android:title="@string/debug"
+        app:showAsAction="never" />
+
 </menu>
