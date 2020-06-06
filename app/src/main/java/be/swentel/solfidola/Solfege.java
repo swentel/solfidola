@@ -110,6 +110,8 @@ public class Solfege extends Fragment implements RecognitionListener {
     private TextView instrument;
     private TextView speechOutput;
     private TextView exercise;
+    private TextView debug;
+    private String debugInfo;
     private MusicBarView bar;
     boolean intervalDescending = false;
     private boolean volumeOn = true;
@@ -173,6 +175,7 @@ public class Solfege extends Fragment implements RecognitionListener {
 
         layout = view.findViewById(R.id.layout_root);
         speechOutput = view.findViewById(R.id.speechOutput);
+        debug = view.findViewById(R.id.debug);
         bar = view.findViewById(R.id.bar);
         playbackMode = view.findViewById(R.id.playbackMode);
         intervalType = view.findViewById(R.id.intervalType);
@@ -547,7 +550,7 @@ public class Solfege extends Fragment implements RecognitionListener {
             ArrayList<Integer> exerciseIntervals = e.getIntervals();
 
             Debug.debug("-------------------------------");
-            Debug.debug("Extercise intervals: " + exerciseIntervals.toString());
+            debugInfo = Debug.debug("Extercise intervals: " + exerciseIntervals.toString());
 
             for (Integer in : exerciseIntervals) {
                 if (intervalDescending) {
@@ -566,7 +569,7 @@ public class Solfege extends Fragment implements RecognitionListener {
                 removeUnison = true;
             }
 
-            Debug.debug("Selected: " + selectedIntervals.toString());
+            debugInfo += Debug.debug("Selected: " + selectedIntervals.toString());
 
             notes.add(new Note(60, 0, LOWER_C));
             notes.add(new Note(61, 0, LOWER_C));
@@ -594,8 +597,8 @@ public class Solfege extends Fragment implements RecognitionListener {
             notes.add(new Note(83, 13, DOUBLE_HIGH_B));
 
             int counter = 0;
-            Debug.debug("descending: " + (intervalDescending ? "yes" : "no"));
-            Debug.debug("index: " + root_index);
+            debugInfo += Debug.debug("descending: " + (intervalDescending ? "yes" : "no"));
+            debugInfo += Debug.debug("index: " + root_index);
             ArrayList<Note> notesToRemove = new ArrayList<>();
             for (Note n: notes) {
                 if (n.getRootIdValue() < root_index) {
@@ -608,9 +611,9 @@ public class Solfege extends Fragment implements RecognitionListener {
                     notesToRemove.add(n);
                 }
             }
-            Debug.debug("to remove: " + notesToRemove.size());
+            debugInfo += Debug.debug("to remove: " + notesToRemove.size());
             notes.removeAll(notesToRemove);
-            Debug.debug("total notes: " + notes.size());
+            debugInfo += Debug.debug("total notes: " + notes.size());
             int indexInterval = 0;
             notesToRemove.clear();
             while (indexInterval < 13) {
@@ -637,7 +640,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         }
 
         for (Note n: notes) {
-            Debug.debug("Added note: " + n.getMidiValue() + " - " + n.getNoteViewValue());
+            debugInfo += Debug.debug("Added note: " + n.getMidiValue() + " - " + n.getNoteViewValue());
         }
 
         randomNotes.clear();
@@ -662,8 +665,8 @@ public class Solfege extends Fragment implements RecognitionListener {
         else {
             interval = randomNotes.get(1).getMidiValue() - randomNotes.get(0).getMidiValue();
         }
-        Debug.debug("midi value: " + randomNotes.get(0).getMidiValue() + " - " + randomNotes.get(1).getMidiValue());
-        Debug.debug("interval: " + interval);
+        debugInfo += Debug.debug("midi value: " + randomNotes.get(0).getMidiValue() + " - " + randomNotes.get(1).getMidiValue());
+        debugInfo += Debug.debug("interval: " + interval);
     }
 
     /**
@@ -827,6 +830,10 @@ public class Solfege extends Fragment implements RecognitionListener {
         AlertDialog mDialog;
 
         switch (item.getItemId()) {
+            case R.id.debug:
+                debug.setVisibility(View.VISIBLE);
+                debug.setText(debugInfo);
+                return true;
             case R.id.playback:
                 final CharSequence[] playback = {getString(R.string.melodic), getString(R.string.harmonic)};
                 mBuilder.setTitle(R.string.playback);

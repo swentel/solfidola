@@ -4,9 +4,10 @@ import android.util.Log;
 
 public class Debug {
 
-    public static void debug(String message) {
+    public static String debug(String message) {
         String DEBUG_TAG = "solfidola_debug";
         Log.d(DEBUG_TAG, message);
+        return message + "\n";
     }
 
 }
