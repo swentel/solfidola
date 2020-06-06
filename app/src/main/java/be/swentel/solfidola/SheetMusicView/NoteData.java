@@ -15,7 +15,9 @@ public class NoteData {
         HIGHER_D(9),
         HIGHER_E(10),
         HIGHER_F(11),
-        HIGHER_G(12);
+        HIGHER_G(12),
+        DOUBLE_HIGH_A(13),
+        DOUBLE_HIGH_B(14);
 
         private int value;
         NoteValue(int value) {
@@ -27,7 +29,7 @@ public class NoteData {
         }
 
         public boolean greaterThanHigherB() {
-            return value >= HIGHER_B.getValue();
+            return value >= DOUBLE_HIGH_B.getValue();
         }
     }
 

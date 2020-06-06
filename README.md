@@ -9,6 +9,7 @@ Features:
   - select intervals
   - show bar or not
   - add random non selected interval
+  - select root: A, B, C, D, E, F or random
   - ascending, descending or random
   - playback mode (melodic or harmonic)
   - limit number per session

@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -52,6 +53,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import be.swentel.solfidola.Model.Exercise;
 import be.swentel.solfidola.Model.Interval;
@@ -73,9 +75,15 @@ import jp.kshoji.javax.sound.midi.Receiver;
 import jp.kshoji.javax.sound.midi.ShortMessage;
 
 import static android.content.Context.AUDIO_SERVICE;
+import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.DOUBLE_HIGH_A;
+import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.DOUBLE_HIGH_B;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_A;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_B;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_C;
+import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_D;
+import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_E;
+import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_F;
+import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.HIGHER_G;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_C;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_D;
 import static be.swentel.solfidola.SheetMusicView.NoteData.NoteValue.LOWER_E;
@@ -97,6 +105,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     private TextView intervalType;
     private TextView root;
     private TextView rounds;
+    private TextView roundsCurrent;
     private TextView instrument;
     private TextView speechOutput;
     private TextView exercise;
@@ -108,6 +117,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     private LinearLayout layout;
     private int startTime = 0;
     private boolean hasClicked = false;
+    private boolean sessionDone = false;
     private TableLayout choicesContainer;
     private SoundPool soundPool;
     private boolean soundPoolLoaded = false;
@@ -120,8 +130,11 @@ public class Solfege extends Fragment implements RecognitionListener {
     private List<Button> choices = new ArrayList<>();
     private ArrayList<Note> randomNotes = new ArrayList<>();
     private ArrayList<Interval> intervals = new ArrayList<>();
+    public int roundCount = 0;
     public static final int DEFAULT_ROUNDS = 3;
-    public static final int DEFAULT_ROOT = 2;
+    public static final int DEFAULT_ROOT = 0;
+    public static final int UNLIMITED_ROUNDS = 0;
+    public static final int RANDOM_ROOT = 7;
     public static final int PLAYBACK_MELODIC = 0;
     public static final int PLAYBACK_HARMONIC = 1;
     private static final int DEFAULT_PROGRAM = 0;
@@ -165,6 +178,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         intervalType = view.findViewById(R.id.intervalType);
         root = view.findViewById(R.id.root);
         rounds = view.findViewById(R.id.rounds);
+        roundsCurrent = view.findViewById(R.id.roundsCurrent);
         instrument = view.findViewById(R.id.instrument);
         choicesContainer = view.findViewById(R.id.choicesContainer);
         setHasOptionsMenu(true);
@@ -286,6 +300,14 @@ public class Solfege extends Fragment implements RecognitionListener {
     }
 
     private void doRenew() {
+        if (e.getRoundsLimit() != UNLIMITED_ROUNDS) {
+            if (roundCount == (e.getRoundsLimit() * 10)) {
+                sessionDone = true;
+                Snackbar.make(layout, getString(R.string.session_done), Snackbar.LENGTH_SHORT).show();
+                ((MainActivity)requireActivity()).loadExercises();
+                return;
+            }
+        }
         setup(true);
         playNotes();
     }
@@ -313,9 +335,14 @@ public class Solfege extends Fragment implements RecognitionListener {
         if (isExercise()) {
             root_index = e.getRoot();
         }
+
         String[] rootArray = getResources().getStringArray(R.array.root_options);
         String root_value = rootArray[root_index];
         root.setText(String.format(getString(R.string.root_value), root_value));
+
+        if (root_index == RANDOM_ROOT) {
+            root_index = ThreadLocalRandom.current().nextInt(0, 6);
+        }
     }
 
     private void setRounds() {
@@ -324,6 +351,13 @@ public class Solfege extends Fragment implements RecognitionListener {
             String[] roundsArray = getResources().getStringArray(R.array.round_options);
             String rounds_value = roundsArray[e.getRoundsLimit()];
             rounds.setText(String.format(getString(R.string.rounds_value), rounds_value));
+
+            if (e.getRoundsLimit() != UNLIMITED_ROUNDS) {
+                roundCount++;
+                roundsCurrent.setVisibility(View.VISIBLE);
+                roundsCurrent.setText(String.format(getString(R.string.rounds_current), roundCount, Integer.parseInt(rounds_value)));
+            }
+
         }
     }
 
@@ -536,7 +570,6 @@ public class Solfege extends Fragment implements RecognitionListener {
             if (selectedIntervals.contains(0)) {
                 notes.add(new Note(60, LOWER_C));
             }
-
             if (selectedIntervals.contains(1)) {
                 notes.add(new Note(61, LOWER_C));
             }
@@ -594,6 +627,12 @@ public class Solfege extends Fragment implements RecognitionListener {
                 notes.add(new Note(69, HIGHER_A));
                 notes.add(new Note(71, HIGHER_B));
                 notes.add(new Note(72, HIGHER_C));
+                //notes.add(new Note(74, HIGHER_D));
+                //notes.add(new Note(76, HIGHER_E));
+                //notes.add(new Note(77, HIGHER_F));
+                //notes.add(new Note(79, HIGHER_G));
+                //notes.add(new Note(81, DOUBLE_HIGH_A));
+                //notes.add(new Note(83, DOUBLE_HIGH_B));
             //}
         }
 
@@ -609,13 +648,14 @@ public class Solfege extends Fragment implements RecognitionListener {
         Random randomGenerator = new Random();
 
         // First note
-        randomNotes.add(notes.get(0));
+        randomNotes.add(notes.get(root_index));
 
         if (removeUnison) {
-            notes.remove(0);
+            notes.remove(root_index);
         }
 
         // Second note.
+        //int randomIndex = ThreadLocalRandom.current().nextInt(root_index, root_index + 7);
         int randomIndex = randomGenerator.nextInt(notes.size());
         randomNotes.add(notes.get(randomIndex));
         notes.remove(randomIndex);
@@ -745,7 +785,7 @@ public class Solfege extends Fragment implements RecognitionListener {
 
         if (isExercise()) {
 
-            if (!hasClicked) {
+            if (!hasClicked && !sessionDone) {
                 e.setRounds(e.getRounds() - 1);
             }
 

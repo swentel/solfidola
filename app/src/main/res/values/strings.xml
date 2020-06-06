@@ -63,6 +63,8 @@
     <string name="scale">Scale</string>
     <string name="rounds">Rounds per session</string>
     <string name="rounds_value">Rounds per session: %s</string>
+    <string name="rounds_current">Round: %d/%d</string>
+    <string name="session_done">Session done</string>
     <string name="root">Root</string>
     <string name="root_value">Root: %s</string>
     <string name="pitch_value">Pitch: %f</string>
@@ -80,12 +82,13 @@
     </string-array>
 
     <string-array name="root_options">
-        <item>A</item>
-        <item>B</item>
         <item>C</item>
         <item>D</item>
         <item>E</item>
         <item>F</item>
+        <item>G</item>
+        <item>A</item>
+        <item>B</item>
         <item>Random</item>
     </string-array>
 

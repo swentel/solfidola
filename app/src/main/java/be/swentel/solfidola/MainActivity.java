@@ -148,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     /**
      * Start exercise.
-
+     *
      * @param id
      *   The exercise id.
      */
@@ -157,6 +157,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         bundle.putInt("exercise", id);
         Fragment fragment = new Solfege();
         fragment.setArguments(bundle);
+        startFragment(fragment);
+    }
+
+    /**
+     * Load exercises list.
+     */
+    public void loadExercises() {
+        Fragment fragment = new ExerciseList();
         startFragment(fragment);
     }
 
