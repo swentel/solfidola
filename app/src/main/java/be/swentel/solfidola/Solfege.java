@@ -300,7 +300,7 @@ public class Solfege extends Fragment implements RecognitionListener {
     }
 
     private void doRenew() {
-        if (e.getRoundsLimit() != UNLIMITED_ROUNDS) {
+        if (isExercise() && e.getRoundsLimit() != UNLIMITED_ROUNDS) {
             if (roundCount == (e.getRoundsLimit() * 10)) {
                 sessionDone = true;
                 Snackbar.make(layout, getString(R.string.session_done), Snackbar.LENGTH_SHORT).show();
@@ -334,14 +334,14 @@ public class Solfege extends Fragment implements RecognitionListener {
         root_index = Preferences.getPreference(getContext(), "root", DEFAULT_ROOT);
         if (isExercise()) {
             root_index = e.getRoot();
-        }
 
-        String[] rootArray = getResources().getStringArray(R.array.root_options);
-        String root_value = rootArray[root_index];
-        root.setText(String.format(getString(R.string.root_value), root_value));
+            String[] rootArray = getResources().getStringArray(R.array.root_options);
+            String root_value = rootArray[root_index];
+            root.setText(String.format(getString(R.string.root_value), root_value));
 
-        if (root_index == RANDOM_ROOT) {
-            root_index = ThreadLocalRandom.current().nextInt(0, 6);
+            if (root_index == RANDOM_ROOT) {
+                root_index = ThreadLocalRandom.current().nextInt(0, 6);
+            }
         }
     }
 
@@ -627,12 +627,6 @@ public class Solfege extends Fragment implements RecognitionListener {
                 notes.add(new Note(69, HIGHER_A));
                 notes.add(new Note(71, HIGHER_B));
                 notes.add(new Note(72, HIGHER_C));
-                //notes.add(new Note(74, HIGHER_D));
-                //notes.add(new Note(76, HIGHER_E));
-                //notes.add(new Note(77, HIGHER_F));
-                //notes.add(new Note(79, HIGHER_G));
-                //notes.add(new Note(81, DOUBLE_HIGH_A));
-                //notes.add(new Note(83, DOUBLE_HIGH_B));
             //}
         }
 
@@ -812,8 +806,6 @@ public class Solfege extends Fragment implements RecognitionListener {
             menuOptions.add(R.id.sheetMusic);
             menuOptions.add(R.id.interval);
             menuOptions.add(R.id.playback);
-            menuOptions.add(R.id.scale);
-            menuOptions.add(R.id.root);
 
             MenuItem item;
             for (Integer id : menuOptions) {
@@ -879,39 +871,6 @@ public class Solfege extends Fragment implements RecognitionListener {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, boolean b) {
                         Preferences.setPreference(getContext(), "show_bar", b);
-                        dialogInterface.dismiss();
-                        doRenew();
-                    }
-                });
-                mDialog = mBuilder.create();
-                mDialog.show();
-                return true;
-            case R.id.root:
-                final CharSequence[] rootChoices = getResources().getStringArray(R.array.root_options);
-                mBuilder.setTitle(R.string.root);
-                int currentRoot = Preferences.getPreference(getContext(), "root", DEFAULT_ROOT);
-                mBuilder.setSingleChoiceItems(rootChoices, currentRoot, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Preferences.setPreference(getContext(), "root", i);
-                        dialogInterface.dismiss();
-                        doRenew();
-                    }
-                });
-                mDialog = mBuilder.create();
-                mDialog.show();
-                return true;
-            case R.id.scale:
-                final CharSequence[] scales = {"Cmaj", "Cmin"};
-                mBuilder.setTitle(R.string.scale);
-                int currentScale = 0;
-                if (Preferences.getPreference(getContext(), "scale", DEFAULT_SCALE).equals("Cmin")) {
-                    currentScale = 1;
-                }
-                mBuilder.setSingleChoiceItems(scales, currentScale, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Preferences.setPreference(getContext(), "scale", scales[i].toString());
                         dialogInterface.dismiss();
                         doRenew();
                     }
