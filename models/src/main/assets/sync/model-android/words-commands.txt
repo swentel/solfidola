@@ -4,10 +4,8 @@ to
 three
 tree
 four
-fore
 five
 six
-sex
 seven
 eight
 nine

@@ -32,8 +32,8 @@ Features:
 
 To add new commands to be recognized, add new words to words-commands.txt and these commands:
 
-- fstsymbols --save_osymbols=words.txt Gr.fst > /dev/null
-- farcompilestrings --fst_type=compact --symbols=words.txt --keep_symbols words-commands.txt | ngramcount | ngrammake | fstconvert --fst_type=ngram > Gr.fst
+fstsymbols --save_osymbols=words.txt Gr.fst > /dev/null
+farcompilestrings --fst_type=compact --symbols=words.txt --keep_symbols words-commands.txt | ngramcount | ngrammake | fstconvert --fst_type=ngram > Gr.fst
 
 ## Credits
 
