@@ -122,7 +122,7 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
 
             // Rounds.
             String[] roundsArray = context.getResources().getStringArray(R.array.round_options);
-            String rounds_value = roundsArray[exercise.getRounds()];
+            String rounds_value = roundsArray[exercise.getRoundsLimit()];
             holder.rounds.setText(String.format(context.getString(R.string.rounds_value), rounds_value));
 
             // Interval type.
@@ -149,9 +149,9 @@ public class ExerciseListAdapter extends BaseAdapter implements OnClickListener 
             holder.playbackMode.setText(String.format(context.getString(R.string.playback_mode), playbackMode));
 
             // Stats.
-            int success = exercise.getAttempts() - exercise.getMistakes();
+            int success = exercise.getRounds() - exercise.getMistakes();
             String elapsed = Formatter.elapsedTime(exercise.getTimer());
-            String stats = String.format(context.getString(R.string.stats), success, exercise.getAttempts(), exercise.getReplays(), elapsed);
+            String stats = String.format(context.getString(R.string.stats), success, exercise.getRounds(), exercise.getReplays(), elapsed);
             holder.stats.setText(stats);
 
             // Published

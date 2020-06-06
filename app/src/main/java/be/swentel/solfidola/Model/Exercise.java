@@ -13,7 +13,7 @@ import static be.swentel.solfidola.db.DatabaseHelper.DATA_TYPE_EXERCISE;
 
 public class Exercise extends Record {
 
-    private int attempts = 0;
+    private int rounds = 0;
     private int mistakes = 0;
     private int timer = 0;
     private int replays = 0;
@@ -22,7 +22,7 @@ public class Exercise extends Record {
     private int root = DEFAULT_ROOT;
     private boolean showBar = false;
     private boolean randomInterval = false;
-    private int rounds = DEFAULT_ROUNDS;
+    private int roundsLimit = DEFAULT_ROUNDS;
     private ArrayList<Integer> intervals = new ArrayList<>();
     private int playbackMode = PLAYBACK_MELODIC;
 
@@ -38,12 +38,12 @@ public class Exercise extends Record {
         intervals.add(interval);
     }
 
-    public int getAttempts() {
-        return attempts;
+    public int getRounds() {
+        return rounds;
     }
 
-    public void setAttempts(int attempts) {
-        this.attempts = attempts;
+    public void setRounds(int rounds) {
+        this.rounds = rounds;
     }
 
     public int getTimer() {
@@ -106,12 +106,12 @@ public class Exercise extends Record {
         this.root = root;
     }
 
-    public int getRounds() {
-        return rounds;
+    public int getRoundsLimit() {
+        return roundsLimit;
     }
 
-    public void setRounds(int rounds) {
-        this.rounds = rounds;
+    public void setRoundsLimit(int roundsLimit) {
+        this.roundsLimit = roundsLimit;
     }
 
     public void setPlaybackMode(int playbackMode) {
@@ -143,7 +143,7 @@ public class Exercise extends Record {
             }
 
             if (o.has("attempts")) {
-                this.setAttempts(o.getInt("attempts"));
+                this.setRounds(o.getInt("attempts"));
             }
 
             if (o.has("mistakes")) {
@@ -167,7 +167,7 @@ public class Exercise extends Record {
             }
 
             if (o.has("rounds")) {
-                this.setRounds(o.getInt("rounds"));
+                this.setRoundsLimit(o.getInt("rounds"));
             }
         }
         catch (JSONException ignored) { }
@@ -191,10 +191,10 @@ public class Exercise extends Record {
             o.put("timer", this.getTimer());
             o.put("replays", this.getReplays());
             o.put("mistakes", this.getMistakes());
-            o.put("attempts", this.getAttempts());
+            o.put("attempts", this.getRounds());
             o.put("playbackMode", this.getPlaybackMode());
             o.put("root", this.getRoot());
-            o.put("rounds", this.getRounds());
+            o.put("rounds", this.getRoundsLimit());
         }
         catch (JSONException ignored) { }
         this.setData(o.toString());

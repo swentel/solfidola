@@ -101,7 +101,7 @@ public class ExerciseForm extends AppCompatActivity {
                 e.setPlaybackMode(playbackMode);
 
                 e.setRoot(root.getSelectedItemPosition());
-                e.setRounds(rounds.getSelectedItemPosition());
+                e.setRoundsLimit(rounds.getSelectedItemPosition());
 
                 if (e.getIntervals().size() > 1) {
                     e.flattenData();

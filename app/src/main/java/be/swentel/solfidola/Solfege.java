@@ -86,6 +86,7 @@ public class Solfege extends Fragment implements RecognitionListener {
 
     private Exercise e = null;
     private int interval = 1;
+    private int root_index = DEFAULT_ROOT;
     private Receiver receiver;
     private SoftSynthesizer synthesizer;
     private Model model;
@@ -259,7 +260,7 @@ public class Solfege extends Fragment implements RecognitionListener {
 
         hasClicked = false;
         if (isExercise()) {
-            e.setAttempts(e.getAttempts() + 1);
+            e.setRounds(e.getRounds() + 1);
             saveExercise();
         }
 
@@ -308,11 +309,12 @@ public class Solfege extends Fragment implements RecognitionListener {
     }
 
     private void setRoot() {
-        String root_value = "C";
+        root_index = Preferences.getPreference(getContext(), "root", DEFAULT_ROOT);
         if (isExercise()) {
-            String[] rootArray = getResources().getStringArray(R.array.root_options);
-            root_value = rootArray[e.getRoot()];
+            root_index = e.getRoot();
         }
+        String[] rootArray = getResources().getStringArray(R.array.root_options);
+        String root_value = rootArray[root_index];
         root.setText(String.format(getString(R.string.root_value), root_value));
     }
 
@@ -320,7 +322,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         if (isExercise()) {
             rounds.setVisibility(View.VISIBLE);
             String[] roundsArray = getResources().getStringArray(R.array.round_options);
-            String rounds_value = roundsArray[e.getRounds()];
+            String rounds_value = roundsArray[e.getRoundsLimit()];
             rounds.setText(String.format(getString(R.string.rounds_value), rounds_value));
         }
     }
@@ -744,7 +746,7 @@ public class Solfege extends Fragment implements RecognitionListener {
         if (isExercise()) {
 
             if (!hasClicked) {
-                e.setAttempts(e.getAttempts() - 1);
+                e.setRounds(e.getRounds() - 1);
             }
 
             @SuppressLint("SimpleDateFormat")
@@ -837,6 +839,21 @@ public class Solfege extends Fragment implements RecognitionListener {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, boolean b) {
                         Preferences.setPreference(getContext(), "show_bar", b);
+                        dialogInterface.dismiss();
+                        doRenew();
+                    }
+                });
+                mDialog = mBuilder.create();
+                mDialog.show();
+                return true;
+            case R.id.root:
+                final CharSequence[] rootChoices = getResources().getStringArray(R.array.root_options);
+                mBuilder.setTitle(R.string.root);
+                int currentRoot = Preferences.getPreference(getContext(), "root", DEFAULT_ROOT);
+                mBuilder.setSingleChoiceItems(rootChoices, currentRoot, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Preferences.setPreference(getContext(), "root", i);
                         dialogInterface.dismiss();
                         doRenew();
                     }
