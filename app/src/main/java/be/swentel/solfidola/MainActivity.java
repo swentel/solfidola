@@ -114,12 +114,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 close = true;
                 fragment = new ExerciseList();
                 break;
-
-            case R.id.nav_tuner:
-                close = true;
-                fragment = new TunerFragment();
-                break;
-
         }
 
         if (close) {

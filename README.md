@@ -22,7 +22,6 @@ Features:
     (augmented fifth), major sixth (diminished seventh), minor seventh, major seventh, octave
 - Sound feedback when using the microphone
 - Auto plays the interval and refreshes when the right solution is selected
-- Tuner: still in experimental state (sing note C)
 
 ## Screenshot
 

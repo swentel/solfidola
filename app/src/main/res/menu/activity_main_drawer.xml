@@ -15,11 +15,6 @@
             android:icon="@drawable/music_note"
             android:title="@string/menu_solfege" />
 
-        <item
-            android:id="@+id/nav_tuner"
-            android:icon="@android:drawable/ic_btn_speak_now"
-            android:title="@string/menu_tuner" />
-
     </group>
 
 </menu>
